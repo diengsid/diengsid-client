@@ -34,7 +34,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
+  /* --color-primary: var(--primary); */
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -46,11 +46,28 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --color-primary: #009933;
+  --color-primary-50: #edfff2;
+  --color-primary-100: #d6ffe2;
+  --color-primary-200: #afffc8;
+  --color-primary-300: #71ff9f;
+  --color-primary-400: #2dfb70;
+  --color-primary-500: #02e54c;
+  --color-primary-600: #00bf3f;
+  --color-primary-700: #009933;
+  --color-primary-800: #06752c;
+  --color-primary-900: #085f27;
+  --color-primary-950: #003614;
+
+  --shadow-custom:
+    0 0.5px 10px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.02);
+  --shadow-custom-sm: 0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow-custom-lg: 0 8px 28px rgba(0, 0, 0, 0.12);
+  --shadow-custom-hover: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -81,6 +98,20 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }
 
 .dark {
@@ -115,16 +146,4 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
-  }
 }
