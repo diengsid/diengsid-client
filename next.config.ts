@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
     ],
     dangerouslyAllowLocalIP: true, // 🔥 ini kunci
   },
+  output: "standalone",
 };
 
 export default nextConfig;

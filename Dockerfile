@@ -25,7 +25,7 @@ ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN bun run build
+RUN bun run build && test -d .next/standalone || (echo "ERROR: .next/standalone not found — pastikan output: 'standalone' ada di next.config.ts" && exit 1)
 
 
 # Stage 3: Production runner

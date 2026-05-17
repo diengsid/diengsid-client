@@ -1,0 +1,32 @@
+# Dependencies (handled by deps stage)
+node_modules
+.pnp
+.pnp.js
+
+# Build output (generated inside Docker)
+.next
+out
+
+# Environment files (injected by CI at build time)
+.env*.local
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Dev tooling
+.eslintrc*
+.prettierrc*
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
