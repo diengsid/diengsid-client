@@ -8,7 +8,7 @@ export default async function SignIn() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
-  if (token?.value !== "") redirect("/");
+  if (!!token && token?.value !== "") redirect("/");
 
   return (
     <>
