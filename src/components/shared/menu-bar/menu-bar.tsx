@@ -24,8 +24,8 @@ const menuUnathorize: Menu[] = [
     icon: Heart,
   },
   {
-    label: "Masuk",
-    path: "/login",
+    label: "Profile",
+    path: "/profile",
     icon: User,
   },
 ];
@@ -43,7 +43,7 @@ export default function MenuBar({ token }: Props): React.ReactNode {
         ...menuUnathorize.slice(0, 2),
         {
           label: "Perjalanan",
-          path: "/login",
+          path: "/journeys",
           icon: Navigation,
         },
         ...menuUnathorize.slice(2),

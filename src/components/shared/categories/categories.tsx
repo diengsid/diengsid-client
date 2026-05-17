@@ -61,7 +61,7 @@ export default function Categories(): React.ReactNode {
     <div
       className={`${
         scrollY > 490 ? "shadow-custom" : "shadow-none"
-      } sticky top-19 z-50 overflow-hidden bg-white pt-5`}
+      } sticky top-18 z-50 overflow-hidden bg-white pt-5`}
     >
       <div className="container mx-auto px-13">
         <Carousel className="w-full">

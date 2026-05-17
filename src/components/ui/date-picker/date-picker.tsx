@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button/Button";
+
 import clsx from "clsx";
 import {
   addDays,
@@ -14,6 +14,7 @@ import {
 } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import Button from "../button/button";
 
 type Props = {
   value?: Date;

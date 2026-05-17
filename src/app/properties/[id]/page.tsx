@@ -4,6 +4,7 @@ import DetailProperty from "@/features/properties/components/detail";
 import NavItem from "@/features/properties/components/nav-detail";
 import NavbarDetailProperty from "@/features/properties/components/navbar";
 import { parseLocalDate } from "@/lib/date";
+import { cookies } from "next/headers";
 
 type Props = {
   params: Promise<{
@@ -26,6 +27,9 @@ export default async function DetailPropertyPage({
   const checkOutDate = parseLocalDate(check_out);
   const rentableId = rentable_id || "";
 
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token");
+
   return (
     <>
       {/* navbar mobile */}
@@ -35,7 +39,7 @@ export default async function DetailPropertyPage({
 
       {/* navbar desktop */}
       <div className="hidden md:block">
-        <Navbar isFixed={false} />
+        <Navbar isFixed={false} token={token?.value} />
       </div>
 
       <NavItem totalDays={3} />

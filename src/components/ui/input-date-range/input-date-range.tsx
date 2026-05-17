@@ -11,6 +11,7 @@ interface Props {
   labelEnd?: string;
   onChange?: (date: DateRange) => void;
   className?: string;
+  disabledDates?: Set<string>;
 }
 
 export default function InputDateRange({
@@ -19,6 +20,7 @@ export default function InputDateRange({
   labelEnd,
   onChange,
   className,
+  disabledDates,
 }: Props) {
   const [open, setOpen] = useState<boolean>(false);
 
@@ -55,6 +57,7 @@ export default function InputDateRange({
         >
           <DateRangePicker
             value={value}
+            disabledDates={disabledDates}
             onChange={(date: DateRange) => {
               onChange?.(date);
 

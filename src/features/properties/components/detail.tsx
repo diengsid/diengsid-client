@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/preserve-manual-memoization */
 "use client";
 
-import { differenceInCalendarDays, format } from "date-fns";
+import { format } from "date-fns";
 import {
   Armchair,
   DoorClosed,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import DateRangePicker, {
@@ -20,9 +22,11 @@ import GuestSelector from "@/components/shared/guest-selector/guest-selector";
 import Button from "@/components/ui/button/button";
 import InputDateRange from "@/components/ui/input-date-range/input-date-range";
 
+import { useAvailability } from "../hooks/useAvailability";
 import { useFindProperty } from "../hooks/useFindProperty";
 
 import Modal from "@/components/ui/modal/modal";
+import { useBookingCalculation } from "@/hooks/use-booking-calculation";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { scrollToId } from "@/lib/utils";
 import { id } from "date-fns/locale";
@@ -48,15 +52,13 @@ export default function DetailProperty({
   rentableId,
 }: Props) {
   const { setParams } = useQueryParams();
+  const router = useRouter();
   const [dateRange, setDateRange] = useState<DateRange>({
     start: checkIn,
     end: checkOut,
   });
-
   const { data, isFetching } = useFindProperty(propertyId);
   const property = data?.data;
-
-  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const rentableID = useMemo(() => {
     if (!property?.rentable.length) return "";
 
@@ -69,6 +71,22 @@ export default function DetailProperty({
 
   const rentable = property?.rentable.find((num) => num.id === rentableID);
 
+  const { disabledDates } = useAvailability(rentableID);
+
+  console.log(disabledDates);
+  // Ganti semua kalkulasi manual dengan hook ini
+  const {
+    totalDays,
+    basePrice,
+    totalPrice,
+    totalDiscount,
+    finalPrice,
+    pricePerNight,
+    discountPercent,
+    hasDiscount,
+    isReady,
+  } = useBookingCalculation({ dateRange, rentable });
+
   const [modalBook, setModalBook] = useState<boolean>(false);
 
   useEffect(() => {
@@ -79,33 +97,8 @@ export default function DetailProperty({
     });
   }, [rentableID, rentableId, setParams]);
 
-  // ======================
-  // Derived State
-  // ======================
-  const totalDays = useMemo(() => {
-    if (!dateRange.start || !dateRange.end) return 0;
-    return differenceInCalendarDays(dateRange.end, dateRange.start);
-  }, [dateRange.start, dateRange.end]);
+  const isLoadingPrice = isFetching || !property || !isReady;
 
-  const basePrice = rentable?.base_price ?? 0;
-
-  const totalPrice = useMemo(() => {
-    return totalDays * basePrice;
-  }, [totalDays, basePrice]);
-
-  const discount = rentable?.discount ?? 0;
-  const totalDiscount = useMemo(() => {
-    return totalPrice * (discount / 100);
-  }, [totalPrice]);
-
-  const fixPrice = useMemo(() => {
-    return totalPrice - totalDiscount;
-  }, [totalPrice, totalDiscount]);
-  const isLoadingPrice = isFetching || !checkIn || !checkOut || !property;
-
-  // ======================
-  // Handlers
-  // ======================
   const handleDateChange = (value: DateRange) => {
     setDateRange(value);
 
@@ -113,6 +106,19 @@ export default function DetailProperty({
       check_in: value.start ? format(value.start, "yyyy-MM-dd") : null,
       check_out: value.end ? format(value.end, "yyyy-MM-dd") : null,
     });
+  };
+
+  const handlePesan = () => {
+    if (!dateRange.start || !dateRange.end || !rentableID) return;
+
+    const queryParams = new URLSearchParams({
+      start_date: format(dateRange.start, "yyyy-MM-dd"),
+      end_date: format(dateRange.end, "yyyy-MM-dd"),
+      experience_id: propertyId,
+      rentable_id: rentableID,
+    });
+
+    router.push(`/book/properties/${propertyId}?${queryParams.toString()}`);
   };
 
   // ======================
@@ -134,12 +140,13 @@ export default function DetailProperty({
               Rp. {totalPrice.toLocaleString("id-ID")}
             </p>
             <p className="text-md md:text-lg underline font-semibold">
-              Rp. {fixPrice.toLocaleString("id-ID")}
+              Rp. {finalPrice.toLocaleString("id-ID")}
             </p>
           </div>
-          {discount > 0 && (
+          {hasDiscount && (
             <p className="text-sm font-medium text-green-600">
-              Hemat {discount}% (Rp. {totalDiscount.toLocaleString("id-ID")})
+              Hemat {discountPercent}% (Rp.{" "}
+              {totalDiscount.toLocaleString("id-ID")})
             </p>
           )}
         </div>
@@ -193,11 +200,11 @@ export default function DetailProperty({
           </h1>
 
           {/* ADDRESS */}
-          <div className="text-center mt-3 text-gray-500">
+          <div className="text-center md:text-left mt-3 text-gray-500">
             <p>{property?.experience.address}</p>
-            <p className="text-sm">
+            {/* <p className="text-sm">
               10 tamu · 3 kamar · 3 tempat tidur · 4 kamar mandi
-            </p>
+            </p> */}
           </div>
 
           {/* HOST */}
@@ -248,7 +255,11 @@ export default function DetailProperty({
           {/* CALENDAR */}
           <section className="mt-6 border-b relative z-0 pb-6" id="calendars">
             {renderCalendarHeader()}
-            <DateRangePicker value={dateRange} onChange={handleDateChange} />
+            <DateRangePicker
+              value={dateRange}
+              onChange={handleDateChange}
+              disabledDates={disabledDates}
+            />
           </section>
         </div>
 
@@ -286,6 +297,7 @@ export default function DetailProperty({
               <Button
                 className="w-full rounded-full!"
                 disabled={isLoadingPrice || totalDays === 0}
+                onClick={handlePesan}
               >
                 Pesan
               </Button>
@@ -323,6 +335,7 @@ export default function DetailProperty({
             <Button
               className="w-full rounded-full!"
               disabled={isLoadingPrice || totalDays === 0}
+              onClick={handlePesan}
             >
               Pesan
             </Button>
@@ -376,7 +389,7 @@ export default function DetailProperty({
             <div className="flex justify-between font-semibold">
               <p className="text-left">Harta setalah diskon</p>
               <p className="text-right ">
-                Rp. {fixPrice.toLocaleString("id-ID")}
+                Rp. {finalPrice.toLocaleString("id-ID")}
               </p>
             </div>
           </div>

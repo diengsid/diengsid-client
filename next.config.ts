@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
       "source.unsplash.com",
       "images.unsplash.com",
       "localhost",
+      "lh3.googleusercontent.com",
     ],
     dangerouslyAllowLocalIP: true, // 🔥 ini kunci
   },

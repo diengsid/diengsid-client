@@ -12,13 +12,14 @@ import {
   isBefore,
   isSameDay,
   isSameMonth,
+  startOfDay,
   startOfMonth,
   startOfWeek,
   subMonths,
 } from "date-fns";
 import { id } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 export type DateRange = {
   start: Date | null;
@@ -28,6 +29,7 @@ export type DateRange = {
 interface Props {
   value?: DateRange;
   onChange?: (range: DateRange) => void;
+  disabledDates?: Set<string>;
 }
 
 const days = ["Min", "Sn", "Sl", "R", "Km", "J", "Sb"];
@@ -35,12 +37,26 @@ const days = ["Min", "Sn", "Sl", "R", "Km", "J", "Sb"];
 export default function DateRangePicker({
   value,
   onChange,
+  disabledDates,
 }: Props): React.ReactNode {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const [startDate, setStartDate] = useState<Date | null>(value?.start ?? null);
   const [endDate, setEndDate] = useState<Date | null>(value?.end ?? null);
   const [hoverDate, setHoverDate] = useState<Date | null>(null);
+
+  const today = useMemo(() => startOfDay(new Date()), []);
+
+  // First disabled date after startDate — check-out cannot go past it
+  const maxSelectableDate = useMemo(() => {
+    if (!startDate || endDate || !disabledDates?.size) return null;
+    let d = addDays(startDate, 1);
+    for (let i = 0; i < 365; i++) {
+      if (disabledDates.has(format(d, "yyyy-MM-dd"))) return d;
+      d = addDays(d, 1);
+    }
+    return null;
+  }, [startDate, endDate, disabledDates]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -118,6 +134,11 @@ export default function DateRangePicker({
       for (let i = 0; i < 7; i++) {
         const cloneDay = day;
 
+        const isPast = isBefore(cloneDay, today);
+        const isUnavailable = disabledDates?.has(format(cloneDay, "yyyy-MM-dd")) ?? false;
+        const isCutOff = maxSelectableDate ? !isBefore(cloneDay, maxSelectableDate) : false;
+        const isDisabled = isPast || isUnavailable || isCutOff;
+
         const rangeEnd = endDate ?? hoverDate;
 
         const inRange =
@@ -132,11 +153,14 @@ export default function DateRangePicker({
         daysRow.push(
           <div
             key={cloneDay.toString()}
-            onClick={() => handleSelect(cloneDay)}
-            onMouseEnter={() => setHoverDate(cloneDay)}
-            className="h-12 w-12 my-0.5 flex items-center justify-center relative cursor-pointer"
+            onClick={() => !isDisabled && handleSelect(cloneDay)}
+            onMouseEnter={() => !isDisabled && setHoverDate(cloneDay)}
+            className={clsx(
+              "h-12 w-12 my-0.5 flex items-center justify-center relative",
+              isDisabled ? "cursor-not-allowed" : "cursor-pointer",
+            )}
           >
-            {(inRange || isStart || isEnd) && (
+            {(inRange || isStart || isEnd) && !isDisabled && (
               <div
                 className={clsx(
                   "absolute inset-0",
@@ -150,10 +174,11 @@ export default function DateRangePicker({
             <div
               className={clsx(
                 "z-10 h-10 w-10 flex items-center justify-center rounded-full text-sm",
-                !isSameMonth(cloneDay, monthStart) && "text-gray-300",
-                isStart || isEnd
-                  ? "bg-black text-white"
-                  : "hover:border hover:border-black",
+                isDisabled && "text-gray-300 line-through",
+                !isDisabled && !isSameMonth(cloneDay, monthStart) && "text-gray-300",
+                !isDisabled && (isStart || isEnd) && "bg-black text-white",
+                !isDisabled && !(isStart || isEnd) && "hover:border hover:border-black",
+                isUnavailable && isSameMonth(cloneDay, monthStart) && "bg-red-50",
               )}
             >
               {format(cloneDay, "d")}

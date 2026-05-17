@@ -1,15 +1,16 @@
-import Button from "@/components/ui/button/button";
+import BookProperty from "@/features/book/components/book-property";
 import { parseLocalDate } from "@/lib/date";
-import { X } from "lucide-react";
-import Link from "next/link";
+import { cookies } from "next/headers";
 
 type Props = {
   params: Promise<{
     id: string;
   }>;
   searchParams: Promise<{
-    check_in?: string;
-    check_out?: string;
+    start_date?: string;
+    end_date?: string;
+    experience_id?: string;
+    rentable_id?: string;
   }>;
 };
 
@@ -18,21 +19,18 @@ export default async function BookingProperties({
   searchParams,
 }: Props) {
   const { id } = await params;
-  const { check_in, check_out } = await searchParams;
-  const checkInDate = parseLocalDate(check_in);
-  const checkOutDate = parseLocalDate(check_out);
+  const { start_date, end_date, experience_id, rentable_id } = await searchParams;
+  const checkInDate = parseLocalDate(start_date);
+  const checkOutDate = parseLocalDate(end_date);
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
 
   return (
-    <section>
-      <div className="w-full flex justify-end p-3">
-        <Button asChild variant="ghost">
-          <Link
-            href={`/properties/${id}?check_in=${checkInDate}&check_out=${checkOutDate}`}
-          >
-            <X />
-          </Link>
-        </Button>
-      </div>
-    </section>
+    <BookProperty
+      token={token ?? ""}
+      experienceId={experience_id || id}
+      dateRange={{ start: checkInDate, end: checkOutDate }}
+      rentableId={rentable_id}
+    />
   );
 }

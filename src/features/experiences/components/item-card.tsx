@@ -1,5 +1,5 @@
 import { addDays } from "date-fns";
-import { Heart, MapPinHouse, Star } from "lucide-react";
+import { Heart } from "lucide-react";
 import Image from "next/image";
 import type React from "react";
 import { Experience } from "../schemas/experience-schema";
@@ -48,36 +48,18 @@ export default function ItemCard({ experience }: Props): React.ReactNode {
             />
           </button>
         </div>
-        <div className="absolute  top-3 left-3 rounded-md bg-white/90 px-2 py-1 text-[10px] font-bold capitalize shadow-sm backdrop-blur-sm">
-          {experience.experience_type}
-        </div>
       </div>
 
       <div className="mt-1 flex items-start justify-between">
         <h3 className="truncate pr-2 font-semibold text-gray-900">
           {experience.title}
         </h3>
-        <div className="flex items-center gap-1">
-          <Star size={14} className="fill-black text-black" />
-          <span className="text-sm text-gray-900">{experience.lng}</span>
-        </div>
       </div>
 
       <div className="flex w-full items-center justify-start gap-1 text-gray-500">
-        <div>
-          <MapPinHouse size={13} />
-        </div>
-        <div className="flex gap-1 truncate text-xs">{experience.address}</div>
-      </div>
-
-      <div className="mt-1 flex items-baseline gap-1">
-        <span className="font-semibold text-gray-900">
+        <div className="flex gap-1 truncate text-xs">
           Rp {experience.base_price.toLocaleString("id-ID")}
-        </span>
-        <span className="text-sm text-gray-900">
-          {experience.experience_type === "homestay" ? "/ malam" : ""}
-          {experience.experience_type === "Jeep Tour" ? " trip" : ""}
-        </span>
+        </div>
       </div>
     </div>
   );

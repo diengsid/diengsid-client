@@ -1,11 +1,20 @@
-import Login from "@/features/auth/components/login";
+import { Footer } from "@/components/shared/footer/footer";
+import Navbar from "@/components/shared/navbar/navbar";
+import SignInPage from "@/features/auth/components/sign-in-page";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function SignIn() {
+export default async function SignIn() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token");
+
+  if (token?.value !== "") redirect("/");
+
   return (
-    <div
-      className={`w-full h-full ${true ? "flex" : "hidden"} items-center justify-center fixed top-0 left-0 bg-zinc-900/40 z-10 transition-all duration-1000`}
-    >
-      <Login />
-    </div>
+    <>
+      <Navbar />
+      <SignInPage />
+      <Footer />
+    </>
   );
 }
