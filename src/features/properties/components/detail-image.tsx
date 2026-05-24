@@ -213,6 +213,7 @@ export default function DetailImageProperty({
                   fill
                   loading="eager"
                   className="object-cover"
+                  unoptimized
                 />
               </div>
             </SwiperSlide>
@@ -236,6 +237,7 @@ export default function DetailImageProperty({
             src={images[0].image_url}
             alt="main image"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
+            unoptimized
           />
         </div>
 
@@ -249,6 +251,7 @@ export default function DetailImageProperty({
             src={images[1]?.image_url ?? images[0].image_url}
             alt="image 2"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
+            unoptimized
           />
         </div>
 
@@ -262,6 +265,7 @@ export default function DetailImageProperty({
             src={images[2]?.image_url ?? images[0].image_url}
             alt="image 3"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
+            unoptimized
           />
         </div>
 
@@ -275,6 +279,7 @@ export default function DetailImageProperty({
             src={images[3]?.image_url ?? images[0].image_url}
             alt="image 4"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
+            unoptimized
           />
         </div>
 
@@ -288,6 +293,7 @@ export default function DetailImageProperty({
             src={images[4]?.image_url ?? images[0].image_url}
             alt="image 5"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
+            unoptimized
           />
           {images.length > 5 && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white font-semibold text-lg">
