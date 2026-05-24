@@ -29,6 +29,12 @@ import { useCallback, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { AmenityIcon } from "./amenity-icon";
 import { ImageUploader, UploadedImage } from "./image-uploader";
+import dynamic from "next/dynamic";
+
+const MapPicker = dynamic(
+  () => import("@/components/shared/map-picker/MapPicker"),
+  { ssr: false, loading: () => <div className="h-[280px] w-full rounded-xl bg-zinc-100 animate-pulse" /> },
+);
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
@@ -48,6 +54,8 @@ type HostMode = "new" | "existing";
 type ExpData = {
   title: string;
   address: string;
+  lat: number | null;
+  lng: number | null;
   description: string;
   experience_type: string;
   base_price: number;
@@ -257,11 +265,32 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
   const [exp, setExp] = useState<ExpData>({
     title: "",
     address: "",
+    lat: null,
+    lng: null,
     description: "",
     experience_type: "property",
     base_price: 0,
     images: [],
   });
+
+  const [geocoding, setGeocoding] = useState(false);
+
+  const handleMapPick = useCallback(async (lat: number, lng: number) => {
+    setExp((s) => ({ ...s, lat, lng, address: "" }));
+    setGeocoding(true);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+        { headers: { "Accept-Language": "id" } },
+      );
+      const data = await res.json();
+      setExp((s) => ({ ...s, address: data.display_name ?? "" }));
+    } catch {
+      // keep address empty, user can type manually
+    } finally {
+      setGeocoding(false);
+    }
+  }, []);
 
   // ── step 2: property ───────────────────────────────────────────────────────
   const [prop, setProp] = useState<PropData>({
@@ -327,7 +356,7 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
   // ── validation ─────────────────────────────────────────────────────────────
   const canAdvanceStep1 =
     exp.title.trim() &&
-    exp.address.trim() &&
+    (exp.address.trim() || exp.lat !== null) &&
     exp.description.trim() &&
     exp.base_price > 0;
 
@@ -366,6 +395,8 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
         base_price: exp.base_price,
         thumbnail_url: primaryImg?.url,
         images: imageInputs,
+        lat: exp.lat ?? undefined,
+        lng: exp.lng ?? undefined,
       });
       const experienceId = expRes.data.id;
 
@@ -503,15 +534,22 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
 
                 <div className="col-span-2 space-y-1">
                   <label className={labelCls}>
-                    Alamat <span className="text-red-500">*</span>
+                    Lokasi <span className="text-red-500">*</span>
                   </label>
+                  <MapPicker
+                    value={exp.lat !== null && exp.lng !== null ? { lat: exp.lat, lng: exp.lng } : null}
+                    onChange={handleMapPick}
+                    loading={geocoding}
+                  />
+                </div>
+
+                <div className="col-span-2 space-y-1">
+                  <label className={labelCls}>Alamat</label>
                   <input
                     value={exp.address}
-                    onChange={(e) =>
-                      setExp((s) => ({ ...s, address: e.target.value }))
-                    }
+                    onChange={(e) => setExp((s) => ({ ...s, address: e.target.value }))}
                     className={inputCls}
-                    placeholder="Alamat lengkap"
+                    placeholder="Pilih lokasi di peta, atau ketik manual"
                   />
                 </div>
 
