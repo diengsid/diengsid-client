@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   // forward seluruh Cookie header agar backend bisa baca HTTP-only cookie "token"
   const cookieHeader = req.headers.get("cookie") ?? "";
 
