@@ -27,6 +27,7 @@ export default function RentableCard({
           alt={rentable.name}
           fill
           className="object-cover"
+          unoptimized
         />
 
         {/* Badge */}
