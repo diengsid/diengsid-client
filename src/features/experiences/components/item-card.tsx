@@ -39,6 +39,7 @@ export default function ItemCard({ experience }: Props): React.ReactNode {
           src={experience.thumbnail_url}
           alt={experience.title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          unoptimized
         />
         <div className="absolute top-3 right-3">
           <button className="rounded-full bg-transparent p-2 text-white transition-colors hover:bg-white/10">
