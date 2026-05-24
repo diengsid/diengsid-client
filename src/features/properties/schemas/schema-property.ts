@@ -1,6 +1,13 @@
 import { ExperienceSchema } from "@/features/experiences/schemas/experience-schema";
 import { z } from "zod/v3";
 
+export const AmenitySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  icon: z.string().optional().default(""),
+  category: z.string().optional().default(""),
+});
+
 export const RentableSchema = z.object({
   id: z.string(),
   property_id: z.string(),
@@ -11,6 +18,7 @@ export const RentableSchema = z.object({
   base_price: z.number(),
   discount: z.number(),
   stock: z.number(),
+  amenities: z.array(AmenitySchema).optional().default([]),
   created_at: z.number(),
   updated_at: z.number(),
 });
@@ -35,6 +43,7 @@ export const PropertySchema = z.object({
   experience: ExperienceSchema,
   host: HostSchema,
   rentable: z.array(RentableSchema),
+  amenities: z.array(AmenitySchema).optional().default([]),
   property_type: z.string(),
   booking_type: z.string(),
   created_at: z.number(),
@@ -44,3 +53,4 @@ export const PropertySchema = z.object({
 export type Property = z.infer<typeof PropertySchema>;
 export type Host = z.infer<typeof HostSchema>;
 export type Rentable = z.infer<typeof RentableSchema>;
+export type Amenity = z.infer<typeof AmenitySchema>;

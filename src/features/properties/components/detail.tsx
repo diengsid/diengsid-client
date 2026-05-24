@@ -2,14 +2,8 @@
 "use client";
 
 import { format } from "date-fns";
-import {
-  Armchair,
-  DoorClosed,
-  Drum,
-  HouseWifi,
-  PenLine,
-  WavesLadder,
-} from "lucide-react";
+import { DoorClosed, PenLine } from "lucide-react";
+import { AmenityIcon } from "@/features/admin/components/amenity-icon";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -24,6 +18,7 @@ import InputDateRange from "@/components/ui/input-date-range/input-date-range";
 
 import { useAvailability } from "../hooks/useAvailability";
 import { useFindProperty } from "../hooks/useFindProperty";
+import type { Amenity } from "../schemas/schema-property";
 
 import Modal from "@/components/ui/modal/modal";
 import { useBookingCalculation } from "@/hooks/use-booking-calculation";
@@ -69,7 +64,7 @@ export default function DetailProperty({
     return rentableFromProps?.id ?? property.rentable[0].id;
   }, [property?.rentable, rentableId]);
 
-  const rentable = property?.rentable.find((num) => num.id === rentableID);
+  const rentable = property?.rentable?.find((num) => num.id === rentableID);
 
   const { disabledDates } = useAvailability(rentableID);
 
@@ -98,6 +93,82 @@ export default function DetailProperty({
   }, [rentableID, rentableId, setParams]);
 
   const isLoadingPrice = isFetching || !property || !isReady;
+
+  if (isFetching && !property) {
+    return (
+      <div className="max-w-6xl mx-auto w-full animate-pulse">
+        {/* image skeleton */}
+        <div className="relative aspect-square md:hidden rounded-2xl bg-zinc-200" />
+        <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-2 w-full h-113 mt-10">
+          <div className="row-span-2 col-span-2 rounded-l-2xl bg-zinc-200" />
+          <div className="bg-zinc-200" />
+          <div className="rounded-tr-2xl bg-zinc-200" />
+          <div className="bg-zinc-200" />
+          <div className="rounded-br-2xl bg-zinc-200" />
+        </div>
+
+        <div className="flex gap-x-20 mt-6 px-6 md:px-0">
+          {/* left skeleton */}
+          <div className="w-full space-y-6">
+            {/* title */}
+            <div className="h-7 w-2/3 rounded-lg bg-zinc-200" />
+            {/* address */}
+            <div className="h-4 w-1/3 rounded-lg bg-zinc-200" />
+
+            {/* host */}
+            <div className="flex items-center gap-4 border-y py-4">
+              <div className="h-11 w-11 rounded-full bg-zinc-200 shrink-0" />
+              <div className="space-y-2 flex-1">
+                <div className="h-4 w-40 rounded-lg bg-zinc-200" />
+                <div className="h-3 w-56 rounded-lg bg-zinc-200" />
+              </div>
+            </div>
+
+            {/* description */}
+            <div className="space-y-2 border-b pb-6">
+              <div className="h-3 w-full rounded-lg bg-zinc-200" />
+              <div className="h-3 w-5/6 rounded-lg bg-zinc-200" />
+              <div className="h-3 w-4/6 rounded-lg bg-zinc-200" />
+            </div>
+
+            {/* amenities */}
+            <div className="border-b pb-8 space-y-4">
+              <div className="h-5 w-24 rounded-lg bg-zinc-200" />
+              <div className="grid grid-cols-3 gap-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-xl bg-zinc-200 shrink-0" />
+                    <div className="h-3 w-20 rounded-lg bg-zinc-200" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* rooms */}
+            <div className="border-b pb-10 space-y-4">
+              <div className="h-5 w-40 rounded-lg bg-zinc-200" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {Array.from({ length: 2 }).map((_, i) => (
+                  <div key={i} className="h-32 rounded-2xl bg-zinc-200" />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* right sidebar skeleton */}
+          <div className="hidden md:block mt-10 shrink-0">
+            <div className="w-[350px] rounded-2xl border border-zinc-100 p-7 space-y-4">
+              <div className="h-6 w-40 rounded-lg bg-zinc-200" />
+              <div className="h-4 w-24 rounded-lg bg-zinc-200" />
+              <div className="h-12 w-full rounded-xl bg-zinc-200" />
+              <div className="h-12 w-full rounded-xl bg-zinc-200" />
+              <div className="h-11 w-full rounded-full bg-zinc-200" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleDateChange = (value: DateRange) => {
     setDateRange(value);
@@ -231,15 +302,40 @@ export default function DetailProperty({
           </section>
 
           {/* FACILITIES */}
-          <section className="py-8 border-b" id="amenities">
-            <h2 className="text-xl font-semibold">Fasilitas</h2>
-            <div className="mt-6 space-y-4">
-              <Facility icon={<WavesLadder />} label="Kolam renang" />
-              <Facility icon={<HouseWifi />} label="Wifi" />
-              <Facility icon={<Armchair />} label="Ruang tamu" />
-              <Facility icon={<Drum />} label="Studio musik" />
-            </div>
-          </section>
+          {(property?.amenities?.length ?? 0) > 0 && (
+            <section className="py-8 border-b" id="amenities">
+              <h2 className="text-xl font-semibold">Fasilitas</h2>
+              <div className="mt-6 space-y-6">
+                {Object.entries(
+                  (property?.amenities ?? []).reduce<Record<string, Amenity[]>>(
+                    (acc, a) => {
+                      const cat = a.category?.trim() || "Lainnya";
+                      if (!acc[cat]) acc[cat] = [];
+                      acc[cat].push(a);
+                      return acc;
+                    },
+                    {},
+                  ),
+                ).map(([category, items]) => (
+                  <div key={category}>
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 capitalize">
+                      {category}
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      {items!.map((amenity) => (
+                        <div key={amenity.id} className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-600">
+                            <AmenityIcon icon={amenity.icon ?? ""} size={18} />
+                          </div>
+                          <span className="text-sm">{amenity.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* ROOMS */}
           <section className="py-10 border-b" id="rooms">
@@ -407,14 +503,3 @@ export default function DetailProperty({
   );
 }
 
-// ======================
-// Small Components
-// ======================
-function Facility({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <div className="flex items-center gap-3">
-      {icon}
-      <span>{label}</span>
-    </div>
-  );
-}

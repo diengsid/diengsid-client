@@ -1,5 +1,6 @@
 import Categories from "@/components/shared/categories/categories";
 import { Footer } from "@/components/shared/footer/footer";
+import ForbiddenToast from "@/components/shared/forbidden-toast/forbidden-toast";
 import { Hero } from "@/components/shared/hero/hero";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";
 import Navbar from "@/components/shared/navbar/navbar";
@@ -13,6 +14,7 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import { cookies } from "next/headers";
+import { Suspense } from "react";
 
 type Props = {
   searchParams: Promise<{
@@ -42,6 +44,9 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <>
+      <Suspense>
+        <ForbiddenToast />
+      </Suspense>
       <Navbar token={token?.value} />
       <Hero />
       <Categories />

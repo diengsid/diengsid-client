@@ -1,9 +1,10 @@
 import { z } from "zod/v3";
 
 export const ExperienceImageSchema = z.object({
-  id: z.string(),
-  experience_id: z.string(),
+  id: z.string().optional(),
+  experience_id: z.string().optional(),
   image_url: z.string(),
+  is_primary: z.boolean().optional(),
 });
 
 export const ExperienceSchema = z.object({
