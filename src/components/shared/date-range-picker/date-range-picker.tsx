@@ -1,6 +1,5 @@
 "use client";
 
-import Button from "@/components/ui/button/button";
 import clsx from "clsx";
 import {
   addDays,
@@ -32,7 +31,7 @@ interface Props {
   disabledDates?: Set<string>;
 }
 
-const days = ["Min", "Sn", "Sl", "R", "Km", "J", "Sb"];
+const DAY_LABELS = ["Min", "Sn", "Sl", "Rb", "Km", "Jm", "Sb"];
 
 export default function DateRangePicker({
   value,
@@ -40,14 +39,13 @@ export default function DateRangePicker({
   disabledDates,
 }: Props): React.ReactNode {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-
   const [startDate, setStartDate] = useState<Date | null>(value?.start ?? null);
   const [endDate, setEndDate] = useState<Date | null>(value?.end ?? null);
   const [hoverDate, setHoverDate] = useState<Date | null>(null);
 
   const today = useMemo(() => startOfDay(new Date()), []);
 
-  // First disabled date after startDate — check-out cannot go past it
+  // first disabled date after startDate — check-out cannot go past it
   const maxSelectableDate = useMemo(() => {
     if (!startDate || endDate || !disabledDates?.size) return null;
     let d = addDays(startDate, 1);
@@ -59,12 +57,10 @@ export default function DateRangePicker({
   }, [startDate, endDate, disabledDates]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStartDate(value?.start ?? null);
     setEndDate(value?.end ?? null);
   }, [value?.start, value?.end]);
 
-  // 🔥 SELECT LOGIC
   const handleSelect = (day: Date) => {
     let newStart = startDate;
     let newEnd = endDate;
@@ -82,103 +78,82 @@ export default function DateRangePicker({
 
     setStartDate(newStart);
     setEndDate(newEnd);
-
-    onChange?.({
-      start: newStart,
-      end: newEnd,
-    });
+    onChange?.({ start: newStart, end: newEnd });
   };
 
-  const renderHeader = () => (
-    <div className="flex items-center justify-between relative -bottom-11  mb-4">
-      <Button
-        type="button"
-        onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-        variant="ghost"
-      >
-        <ChevronLeft size={20} />
-      </Button>
+  // ── renders one month grid ─────────────────────────────────────────────────
 
-      <Button
-        type="button"
-        onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-        variant="ghost"
-      >
-        <ChevronRight size={20} />
-      </Button>
-    </div>
-  );
-
-  const renderDays = () => (
-    <div className="grid grid-cols-7 text-center text-xs text-gray-400 mb-3">
-      {days.map((day, i) => (
-        <div key={i}>{day}</div>
+  const renderDayHeaders = () => (
+    <div className="grid grid-cols-7">
+      {DAY_LABELS.map((d) => (
+        <div key={d} className="py-1 text-center text-[11px] font-medium text-zinc-400">
+          {d}
+        </div>
       ))}
     </div>
   );
 
   const renderCells = (month: Date) => {
-    const rows = [];
-
     const monthStart = startOfMonth(month);
     const monthEnd = endOfMonth(month);
+    const gridStart = startOfWeek(monthStart);
+    const gridEnd = endOfWeek(monthEnd);
 
-    const startDateWeek = startOfWeek(monthStart);
-    const endDateWeek = endOfWeek(monthEnd);
+    const rows: React.ReactNode[] = [];
+    let day = gridStart;
 
-    let day = startDateWeek;
-
-    while (day <= endDateWeek) {
-      const daysRow = [];
+    while (day <= gridEnd) {
+      const cells: React.ReactNode[] = [];
 
       for (let i = 0; i < 7; i++) {
         const cloneDay = day;
-
         const isPast = isBefore(cloneDay, today);
         const isUnavailable = disabledDates?.has(format(cloneDay, "yyyy-MM-dd")) ?? false;
         const isCutOff = maxSelectableDate ? !isBefore(cloneDay, maxSelectableDate) : false;
         const isDisabled = isPast || isUnavailable || isCutOff;
+        const isCurrentMonth = isSameMonth(cloneDay, monthStart);
 
         const rangeEnd = endDate ?? hoverDate;
-
         const inRange =
           startDate &&
           rangeEnd &&
           isAfter(cloneDay, startDate) &&
           isBefore(cloneDay, rangeEnd);
+        const isStart = startDate ? isSameDay(cloneDay, startDate) : false;
+        const isEnd = endDate ? isSameDay(cloneDay, endDate) : false;
 
-        const isStart = startDate && isSameDay(cloneDay, startDate);
-        const isEnd = endDate && isSameDay(cloneDay, endDate);
-
-        daysRow.push(
+        cells.push(
           <div
-            key={cloneDay.toString()}
+            key={cloneDay.toISOString()}
             onClick={() => !isDisabled && handleSelect(cloneDay)}
             onMouseEnter={() => !isDisabled && setHoverDate(cloneDay)}
+            onMouseLeave={() => setHoverDate(null)}
             className={clsx(
-              "h-12 w-12 my-0.5 flex items-center justify-center relative",
+              "relative flex aspect-square select-none items-center justify-center",
               isDisabled ? "cursor-not-allowed" : "cursor-pointer",
             )}
           >
+            {/* range background strip */}
             {(inRange || isStart || isEnd) && !isDisabled && (
               <div
                 className={clsx(
-                  "absolute inset-0",
-                  inRange && "bg-gray-100",
-                  isStart && "bg-gray-100 rounded-l-full",
-                  isEnd && "bg-gray-100 rounded-r-full",
+                  "absolute inset-y-[15%] inset-x-0",
+                  inRange && "bg-zinc-100",
+                  isStart && "rounded-l-full bg-zinc-100",
+                  isEnd && "rounded-r-full bg-zinc-100",
                 )}
               />
             )}
 
+            {/* date circle */}
             <div
               className={clsx(
-                "z-10 h-10 w-10 flex items-center justify-center rounded-full text-sm",
-                isDisabled && "text-gray-300 line-through",
-                !isDisabled && !isSameMonth(cloneDay, monthStart) && "text-gray-300",
-                !isDisabled && (isStart || isEnd) && "bg-black text-white",
-                !isDisabled && !(isStart || isEnd) && "hover:border hover:border-black",
-                isUnavailable && isSameMonth(cloneDay, monthStart) && "bg-red-50",
+                "relative z-10 flex h-[78%] w-[78%] items-center justify-center rounded-full text-sm transition-colors",
+                !isCurrentMonth && "text-zinc-300",
+                isCurrentMonth && isDisabled && "text-zinc-300 line-through",
+                isCurrentMonth && !isDisabled && !isStart && !isEnd && "hover:bg-zinc-100",
+                isCurrentMonth && !isDisabled && (isStart || isEnd) && "bg-zinc-900 text-white",
+                isUnavailable && isCurrentMonth && "bg-red-50",
               )}
             >
               {format(cloneDay, "d")}
@@ -190,8 +165,8 @@ export default function DateRangePicker({
       }
 
       rows.push(
-        <div key={day.toString()} className="grid grid-cols-7">
-          {daysRow}
+        <div key={day.toISOString()} className="grid grid-cols-7">
+          {cells}
         </div>,
       );
     }
@@ -199,28 +174,57 @@ export default function DateRangePicker({
     return <div>{rows}</div>;
   };
 
-  return (
-    <div className="w-fit pb-4 z-100 bg-white rounded-2xl m-3 ">
-      {renderHeader()}
+  // ── month column ───────────────────────────────────────────────────────────
 
-      <div className="flex gap-6">
-        {/* MONTH 1 */}
-        <div>
-          <div className="text-center font-medium mb-6">
-            {format(currentMonth, "MMMM yyyy", { locale: id })}
+  const navBtn = (onClick: () => void, icon: React.ReactNode) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+    >
+      {icon}
+    </button>
+  );
+
+  const nextMonth = addMonths(currentMonth, 1);
+
+  // ── render ─────────────────────────────────────────────────────────────────
+
+  return (
+    <div className="w-full p-4">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+
+        {/* month 1 */}
+        <div className="min-w-0">
+          <div className="mb-3 flex items-center justify-between">
+            {navBtn(() => setCurrentMonth((m) => subMonths(m, 1)), <ChevronLeft size={16} />)}
+            <span className="text-sm font-semibold text-zinc-800">
+              {format(currentMonth, "MMMM yyyy", { locale: id })}
+            </span>
+            {/* on mobile show the next-month arrow here too */}
+            <div className="md:hidden">
+              {navBtn(() => setCurrentMonth((m) => addMonths(m, 1)), <ChevronRight size={16} />)}
+            </div>
+            {/* spacer on desktop so title stays centered */}
+            <div className="hidden w-8 md:block" />
           </div>
-          {renderDays()}
+          {renderDayHeaders()}
           {renderCells(currentMonth)}
         </div>
 
-        {/* MONTH 2 */}
-        <div className="hidden md:block">
-          <div className="text-center font-medium mb-6">
-            {format(addMonths(currentMonth, 1), "MMMM yyyy")}
+        {/* month 2 — desktop only */}
+        <div className="hidden min-w-0 md:block">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="w-8" />
+            <span className="text-sm font-semibold text-zinc-800">
+              {format(nextMonth, "MMMM yyyy", { locale: id })}
+            </span>
+            {navBtn(() => setCurrentMonth((m) => addMonths(m, 1)), <ChevronRight size={16} />)}
           </div>
-          {renderDays()}
-          {renderCells(addMonths(currentMonth, 1))}
+          {renderDayHeaders()}
+          {renderCells(nextMonth)}
         </div>
+
       </div>
     </div>
   );
