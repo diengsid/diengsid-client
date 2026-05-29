@@ -23,6 +23,9 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
 ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
+ARG API_URL
+ENV API_URL=$API_URL
+
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN bun run build && test -d .next/standalone || (echo "ERROR: .next/standalone not found — pastikan output: 'standalone' ada di next.config.ts" && exit 1)

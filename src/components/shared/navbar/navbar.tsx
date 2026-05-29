@@ -49,10 +49,10 @@ const CATEGORIES: {
   {
     key: "pengalaman",
     label: "Pengalaman",
-    href: "/experiences",
+    href: "/pengalaman",
     isNew: true,
   },
-  { key: "layanan", label: "Layanan", href: "/services", isNew: true },
+  { key: "layanan", label: "Layanan", href: "/layanan", isNew: true },
 ];
 
 const GUEST_ROWS = [

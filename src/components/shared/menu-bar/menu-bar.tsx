@@ -43,7 +43,7 @@ export default function MenuBar({ token }: Props): React.ReactNode {
         ...menuUnathorize.slice(0, 1),
         {
           label: "Perjalanan",
-          path: "/journeys",
+          path: "/booking",
           icon: Navigation,
         },
         ...menuUnathorize.slice(1),

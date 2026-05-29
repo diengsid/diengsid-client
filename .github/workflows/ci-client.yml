@@ -73,6 +73,7 @@ jobs:
 
           docker build \
             --build-arg NEXT_PUBLIC_API_URL=$API_URL \
+            --build-arg API_URL=$API_URL \
             --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
             -t ghcr.io/${{ github.repository }}:${{ steps.env.outputs.ENV }} \
             -t ghcr.io/${{ github.repository }}:${{ github.sha }} .

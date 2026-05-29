@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 const SITE_URL = "https://diengs.id";
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL;
 
 const staticPages: MetadataRoute.Sitemap = [
   {
