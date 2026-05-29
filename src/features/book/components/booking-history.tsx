@@ -81,7 +81,7 @@ function BookingCard({ booking: b }: { booking: BookingResponse }) {
 
   return (
     <Link
-      href={`/book/confirmation/${b.id}`}
+      href={`/booking/konfirmasi/${b.id}`}
       className="block bg-white rounded-2xl border border-zinc-100 p-5 hover:shadow-md transition group"
     >
       {/* Top row: status + created date */}

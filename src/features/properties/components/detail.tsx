@@ -188,7 +188,7 @@ export default function DetailProperty({
       rentable_id: rentableID,
     });
 
-    router.push(`/book/properties/${propertyId}?${queryParams.toString()}`);
+    router.push(`/booking/penginapan/${propertyId}?${queryParams.toString()}`);
   };
 
   // ======================

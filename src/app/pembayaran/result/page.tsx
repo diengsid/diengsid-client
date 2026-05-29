@@ -64,13 +64,13 @@ export default async function PaymentResultPage({ searchParams }: Props) {
 
           <div className="flex gap-3 w-full">
             {bookingId ? (
-              <Link href={`/book/confirmation/${bookingId}`} className="flex-1">
+              <Link href={`/booking/konfirmasi/${bookingId}`} className="flex-1">
                 <button className="w-full px-4 py-2 rounded-xl bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-700 transition-colors">
                   Lihat booking
                 </button>
               </Link>
             ) : (
-              <Link href="/book" className="flex-1">
+              <Link href="/booking" className="flex-1">
                 <button className="w-full px-4 py-2 rounded-xl bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-700 transition-colors">
                   Riwayat booking
                 </button>

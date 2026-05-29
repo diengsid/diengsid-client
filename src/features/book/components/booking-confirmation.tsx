@@ -394,7 +394,7 @@ export default function BookingConfirmation({
 
         {/* Actions */}
         <div className="flex gap-3 flex-wrap">
-          <Link href="/book" className="flex-1">
+          <Link href="/booking" className="flex-1">
             <Button variant="outline" className="w-full">
               Riwayat booking
             </Button>
@@ -408,7 +408,7 @@ export default function BookingConfirmation({
               {isCreatingPayment ? "Memproses..." : "Bayar sekarang"}
             </Button>
           ) : propertyId ? (
-            <Link href={`/properties/${propertyId}`} className="flex-1">
+            <Link href={`/penginapan/${propertyId}`} className="flex-1">
               <Button className="w-full">Lihat properti</Button>
             </Link>
           ) : (

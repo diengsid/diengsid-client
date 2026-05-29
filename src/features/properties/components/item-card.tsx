@@ -26,7 +26,7 @@ export default function PropertyItemCard({ property }: Props): React.ReactNode {
 
   const handleClick = () => {
     const url =
-      "/properties/" +
+      "/penginapan/" +
       property.id +
       "?check_in=" +
       tomorrow.toISOString().split("T")[0] +
@@ -69,7 +69,9 @@ export default function PropertyItemCard({ property }: Props): React.ReactNode {
       </div>
 
       <div className="mt-1">
-        <h3 className="truncate font-semibold text-gray-900">{property.title}</h3>
+        <h3 className="truncate font-semibold text-gray-900">
+          {property.title}
+        </h3>
         <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
           <MapPin size={11} className="shrink-0" />
           <span className="truncate">{property.address}</span>

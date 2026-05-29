@@ -4,13 +4,31 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   images: {
-    domains: [
-      "picsum.photos",
-      "source.unsplash.com",
-      "images.unsplash.com",
-      "localhost",
-      "lh3.googleusercontent.com",
-      "api.diengs.id",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
+      {
+        protocol: "https",
+        hostname: "source.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "api.diengs.id",
+      },
     ],
     dangerouslyAllowLocalIP: true, // 🔥 ini kunci
   },

@@ -108,7 +108,7 @@ export default function BookProperty({
       {
         onSuccess: (res) =>
           router.push(
-            `/book/confirmation/${res.data.id}?property_id=${propertyId}`,
+            `/booking/konfirmasi/${res.data.id}?property_id=${propertyId}`,
           ),
         onError: (err: unknown) => {
           setErrorMsg(
@@ -149,7 +149,7 @@ export default function BookProperty({
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-20 bg-white border-b">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href={`/properties/${propertyId}`}>
+          <Link href={`/penginapan/${propertyId}`}>
             <Button variant="ghost" size="sm">
               <X size={20} />
             </Button>

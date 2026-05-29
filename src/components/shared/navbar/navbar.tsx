@@ -600,7 +600,7 @@ export default function Navbar({
                         Profil saya
                       </Link>
                       <Link
-                        href="/journeys"
+                        href="/booking"
                         onClick={() => setShowProfileMenu(false)}
                         className="flex items-center gap-3 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50"
                       >
