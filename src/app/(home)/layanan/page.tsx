@@ -1,8 +1,23 @@
+import type { Metadata } from "next";
+import { JsonLd } from "@/components/shared/json-ld";
 import { Footer } from "@/components/shared/footer/footer";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";
 import Navbar from "@/components/shared/navbar/navbar";
 import { Clock } from "lucide-react";
 import { cookies } from "next/headers";
+
+export const metadata: Metadata = {
+  title: "Layanan Wisata Dieng",
+  description:
+    "Berbagai layanan wisata terbaik di kawasan Dieng Wonosobo — segera hadir di Diengs.id.",
+  openGraph: {
+    title: "Layanan Wisata Dieng",
+    description:
+      "Berbagai layanan wisata terbaik di kawasan Dieng Wonosobo — segera hadir di Diengs.id.",
+    url: "https://diengs.id/layanan",
+  },
+  alternates: { canonical: "https://diengs.id/layanan" },
+};
 
 export default async function ServicesPage() {
   const cookieStore = await cookies();
@@ -10,6 +25,26 @@ export default async function ServicesPage() {
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "@id": "https://diengs.id/layanan",
+          name: "Layanan Wisata Dieng",
+          description:
+            "Berbagai layanan wisata terbaik di kawasan Dieng Wonosobo.",
+          url: "https://diengs.id/layanan",
+          provider: {
+            "@type": "Organization",
+            name: "Diengs.id",
+            url: "https://diengs.id",
+          },
+          areaServed: {
+            "@type": "Place",
+            name: "Dieng, Wonosobo, Jawa Tengah, Indonesia",
+          },
+        }}
+      />
       <Navbar token={token?.value} showCategoryTabs />
       <main className="flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-4 text-center">
         <div className="flex flex-col items-center gap-4">

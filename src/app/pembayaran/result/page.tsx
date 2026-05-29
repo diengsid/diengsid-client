@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CheckCircle2, XCircle } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Hasil Pembayaran",
+  robots: { index: false, follow: false },
+};
 
 interface Props {
   searchParams: Promise<{ status?: string; invoice?: string }>;

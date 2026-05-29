@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { Footer } from "@/components/shared/footer/footer";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";
 import Navbar from "@/components/shared/navbar/navbar";
 import BookingHistory from "@/features/book/components/booking-history";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Riwayat Booking",
+  robots: { index: false, follow: false },
+};
 
 export default async function BookingsPage() {
   const cookieStore = await cookies();
