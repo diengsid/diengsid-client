@@ -1,5 +1,4 @@
 import { BookingResponse } from "@/features/book/services/booking-service";
-import { Experience } from "@/features/experiences/schemas/experience-schema";
 import { api } from "@/lib/axios";
 import { ResponseData } from "@/lib/type";
 
@@ -18,21 +17,29 @@ export type AmenityResponse = {
   updated_at: number;
 };
 
-export type ExperienceImageInput = {
-  image_url: string;
-  is_primary: boolean;
+export type HostResponse = {
+  id: string;
+  name: string;
+  email: string;
+  phone_number: string;
+  profile_picture_url: string;
+  address: string;
+  bank_account_name: string;
+  bank_account_number: string;
+  ktp_number: string;
+  bio: string;
+  created_at: number;
+  updated_at: number;
 };
 
-export type ExperienceCreateRequest = {
-  title: string;
-  address: string;
-  description: string;
-  experience_type: string;
-  base_price: number;
-  lat?: number;
-  lng?: number;
-  thumbnail_url?: string;
-  images?: ExperienceImageInput[];
+export const getHosts = async (key?: string): Promise<ResponseData<HostResponse[]>> => {
+  const { data } = await api.get("/hosts", { params: key ? { key } : undefined });
+  return data;
+};
+
+export type PropertyImageInput = {
+  image_url: string;
+  is_primary: boolean;
 };
 
 export const uploadImages = async (files: File[]): Promise<string[]> => {
@@ -60,11 +67,17 @@ export type HostCreateRequest = {
 };
 
 export type PropertyCreateRequest = {
-  experience_id: string;
   host_id?: string;
   host?: HostCreateRequest;
   property_type: string;
   booking_type: string;
+  title: string;
+  address: string;
+  description: string;
+  thumbnail_url?: string;
+  lat?: number;
+  lng?: number;
+  images?: PropertyImageInput[];
   amenity_ids?: string[];
 };
 
@@ -135,14 +148,6 @@ export const createAmenity = async (
 ): Promise<ResponseData<AmenityResponse>> => {
   const response = await api.post("/amenities", req);
   if (response.status !== 201) throw new Error(response.data?.message);
-  return response.data;
-};
-
-export const createExperience = async (
-  req: ExperienceCreateRequest,
-): Promise<ResponseData<Experience>> => {
-  const response = await api.post("/experiences", req);
-  if (!response.data?.success) throw new Error(response.data?.message ?? "Gagal membuat experience");
   return response.data;
 };
 

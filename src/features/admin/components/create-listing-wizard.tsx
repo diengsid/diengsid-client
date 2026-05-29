@@ -1,12 +1,13 @@
 "use client";
 
 import {
-  createExperience,
   createProperty,
   createRentable,
-  ExperienceImageInput,
+  PropertyImageInput,
   getAmenities,
+  getHosts,
   HostCreateRequest,
+  HostResponse,
   uploadImages,
 } from "@/features/admin/services/admin-service";
 import { cn } from "@/lib/utils";
@@ -15,13 +16,14 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  Hash,
   ImageIcon,
   Loader2,
   Plus,
+  Search,
   Trash2,
   Upload,
   UserPlus,
+  Users,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -38,7 +40,6 @@ const MapPicker = dynamic(
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
-const EXPERIENCE_TYPES = ["property", "jeep", "tour", "wisata", "camping"];
 const PROPERTY_TYPES = ["homestay", "villa", "cottage", "glamping", "hotel"];
 const BOOKING_TYPES = ["room", "unit"];
 const RENTABLE_TYPES = ["room", "cottage", "villa", "tent"];
@@ -51,18 +52,13 @@ const labelCls = "text-xs font-medium text-zinc-600";
 
 type HostMode = "new" | "existing";
 
-type ExpData = {
+type PropData = {
   title: string;
   address: string;
   lat: number | null;
   lng: number | null;
   description: string;
-  experience_type: string;
-  base_price: number;
   images: UploadedImage[];
-};
-
-type PropData = {
   property_type: string;
   booking_type: string;
   host_mode: HostMode;
@@ -84,7 +80,7 @@ type RentableRow = {
 
 // ─── step indicator ───────────────────────────────────────────────────────────
 
-const STEPS = ["Experience", "Property", "Kamar/Unit"];
+const STEPS = ["Properti", "Kamar/Unit"];
 
 function StepIndicator({ current }: { current: number }) {
   return (
@@ -258,42 +254,24 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
   });
   const amenities = amenityData?.data ?? [];
 
+  const [hostSearch, setHostSearch] = useState("");
+  const { data: hostsData } = useQuery({
+    queryKey: ["hosts", hostSearch],
+    queryFn: () => getHosts(hostSearch || undefined),
+  });
+  const hosts = hostsData?.data ?? [];
+
   // ── step state ─────────────────────────────────────────────────────────────
   const [step, setStep] = useState(1);
 
-  // ── step 1: experience ─────────────────────────────────────────────────────
-  const [exp, setExp] = useState<ExpData>({
+  // ── step 1: property ───────────────────────────────────────────────────────
+  const [prop, setProp] = useState<PropData>({
     title: "",
     address: "",
     lat: null,
     lng: null,
     description: "",
-    experience_type: "property",
-    base_price: 0,
     images: [],
-  });
-
-  const [geocoding, setGeocoding] = useState(false);
-
-  const handleMapPick = useCallback(async (lat: number, lng: number) => {
-    setExp((s) => ({ ...s, lat, lng, address: "" }));
-    setGeocoding(true);
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
-        { headers: { "Accept-Language": "id" } },
-      );
-      const data = await res.json();
-      setExp((s) => ({ ...s, address: data.display_name ?? "" }));
-    } catch {
-      // keep address empty, user can type manually
-    } finally {
-      setGeocoding(false);
-    }
-  }, []);
-
-  // ── step 2: property ───────────────────────────────────────────────────────
-  const [prop, setProp] = useState<PropData>({
     property_type: "homestay",
     booking_type: "room",
     host_mode: "new",
@@ -312,7 +290,26 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
     amenity_ids: [],
   });
 
-  // ── step 3: rentables ──────────────────────────────────────────────────────
+  const [geocoding, setGeocoding] = useState(false);
+
+  const handleMapPick = useCallback(async (lat: number, lng: number) => {
+    setProp((s) => ({ ...s, lat, lng, address: "" }));
+    setGeocoding(true);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+        { headers: { "Accept-Language": "id" } },
+      );
+      const data = await res.json();
+      setProp((s) => ({ ...s, address: data.display_name ?? "" }));
+    } catch {
+      // keep address empty, user can type manually
+    } finally {
+      setGeocoding(false);
+    }
+  }, []);
+
+  // ── step 2: rentables ──────────────────────────────────────────────────────
   const [rentables, setRentables] = useState<RentableRow[]>([
     {
       name: "",
@@ -354,18 +351,18 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
     setRentables((prev) => prev.filter((_, i) => i !== idx));
 
   // ── validation ─────────────────────────────────────────────────────────────
-  const canAdvanceStep1 =
-    exp.title.trim() &&
-    (exp.address.trim() || exp.lat !== null) &&
-    exp.description.trim() &&
-    exp.base_price > 0;
-
-  const canAdvanceStep2 =
+  const hostValid =
     prop.host_mode === "existing"
       ? prop.host_id.trim() !== ""
-      : prop.host.name.trim() &&
-        prop.host.email.trim() &&
-        prop.host.phone_number.trim();
+      : prop.host.name.trim() !== "" &&
+        prop.host.email.trim() !== "" &&
+        prop.host.phone_number.trim() !== "";
+
+  const canAdvanceStep1 =
+    prop.title.trim() &&
+    (prop.address.trim() || prop.lat !== null) &&
+    prop.description.trim() &&
+    hostValid;
 
   // ── submission ─────────────────────────────────────────────────────────────
   const [submitting, setSubmitting] = useState(false);
@@ -381,48 +378,46 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
 
     setSubmitting(true);
     try {
-      // 1. create experience
-      const primaryImg = exp.images.find((i) => i.is_primary);
-      const imageInputs: ExperienceImageInput[] = exp.images.map((img) => ({
+      // 1. create property (with all info)
+      const primaryImg = prop.images.find((i) => i.is_primary);
+      const imageInputs: PropertyImageInput[] = prop.images.map((img) => ({
         image_url: img.url,
         is_primary: img.is_primary,
       }));
-      const expRes = await createExperience({
-        title: exp.title,
-        address: exp.address,
-        description: exp.description,
-        experience_type: exp.experience_type,
-        base_price: exp.base_price,
-        thumbnail_url: primaryImg?.url,
-        images: imageInputs,
-        lat: exp.lat ?? undefined,
-        lng: exp.lng ?? undefined,
-      });
-      const experienceId = expRes.data.id;
 
-      // 2. create property
       const propPayload =
         prop.host_mode === "existing"
           ? {
-              experience_id: experienceId,
               host_id: prop.host_id,
               property_type: prop.property_type,
               booking_type: prop.booking_type,
-              amenity_ids:
-                prop.amenity_ids.length > 0 ? prop.amenity_ids : undefined,
+              title: prop.title,
+              address: prop.address,
+              description: prop.description,
+              thumbnail_url: primaryImg?.url,
+              lat: prop.lat ?? undefined,
+              lng: prop.lng ?? undefined,
+              images: imageInputs.length > 0 ? imageInputs : undefined,
+              amenity_ids: prop.amenity_ids.length > 0 ? prop.amenity_ids : undefined,
             }
           : {
-              experience_id: experienceId,
               host: prop.host,
               property_type: prop.property_type,
               booking_type: prop.booking_type,
-              amenity_ids:
-                prop.amenity_ids.length > 0 ? prop.amenity_ids : undefined,
+              title: prop.title,
+              address: prop.address,
+              description: prop.description,
+              thumbnail_url: primaryImg?.url,
+              lat: prop.lat ?? undefined,
+              lng: prop.lng ?? undefined,
+              images: imageInputs.length > 0 ? imageInputs : undefined,
+              amenity_ids: prop.amenity_ids.length > 0 ? prop.amenity_ids : undefined,
             };
+
       const propRes = await createProperty(propPayload);
       const propertyId = propRes.data.id;
 
-      // 3. create rentables
+      // 2. create rentables
       const validRentables = rentables.filter(
         (r) => r.name.trim() && r.base_price > 0,
       );
@@ -440,7 +435,7 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
         });
       }
 
-      queryClient.invalidateQueries({ queryKey: ["experiences"] });
+      queryClient.invalidateQueries({ queryKey: ["properties"] });
       queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
       toast.success("Listing berhasil dibuat!");
       onClose();
@@ -470,14 +465,14 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
 
         {/* body */}
         <div className="overflow-y-auto flex-1 p-6 space-y-4">
-          {/* ─ step 1 ─ */}
+          {/* ─ step 1: properti ─ */}
           {step === 1 && (
             <>
               <div className="space-y-1">
                 <label className={labelCls}>Gambar</label>
                 <ImageUploader
-                  images={exp.images}
-                  onChange={(imgs) => setExp((e) => ({ ...e, images: imgs }))}
+                  images={prop.images}
+                  onChange={(imgs) => setProp((s) => ({ ...s, images: imgs }))}
                 />
               </div>
 
@@ -487,96 +482,17 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                     Judul <span className="text-red-500">*</span>
                   </label>
                   <input
-                    value={exp.title}
+                    value={prop.title}
                     onChange={(e) =>
-                      setExp((s) => ({ ...s, title: e.target.value }))
+                      setProp((s) => ({ ...s, title: e.target.value }))
                     }
                     className={inputCls}
-                    placeholder="Nama experience"
+                    placeholder="Nama properti"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className={labelCls}>Tipe</label>
-                  <select
-                    value={exp.experience_type}
-                    onChange={(e) =>
-                      setExp((s) => ({ ...s, experience_type: e.target.value }))
-                    }
-                    className={inputCls}
-                  >
-                    {EXPERIENCE_TYPES.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <label className={labelCls}>
-                    Harga Dasar (Rp) <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={exp.base_price}
-                    onChange={(e) =>
-                      setExp((s) => ({
-                        ...s,
-                        base_price: Number(e.target.value),
-                      }))
-                    }
-                    className={inputCls}
-                    placeholder="0"
-                  />
-                </div>
-
-                <div className="col-span-2 space-y-1">
-                  <label className={labelCls}>
-                    Lokasi <span className="text-red-500">*</span>
-                  </label>
-                  <MapPicker
-                    value={exp.lat !== null && exp.lng !== null ? { lat: exp.lat, lng: exp.lng } : null}
-                    onChange={handleMapPick}
-                    loading={geocoding}
-                  />
-                </div>
-
-                <div className="col-span-2 space-y-1">
-                  <label className={labelCls}>Alamat</label>
-                  <input
-                    value={exp.address}
-                    onChange={(e) => setExp((s) => ({ ...s, address: e.target.value }))}
-                    className={inputCls}
-                    placeholder="Pilih lokasi di peta, atau ketik manual"
-                  />
-                </div>
-
-                <div className="col-span-2 space-y-1">
-                  <label className={labelCls}>
-                    Deskripsi <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={exp.description}
-                    onChange={(e) =>
-                      setExp((s) => ({ ...s, description: e.target.value }))
-                    }
-                    className={cn(inputCls, "resize-none")}
-                    placeholder="Deskripsi experience"
-                  />
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* ─ step 2 ─ */}
-          {step === 2 && (
-            <>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className={labelCls}>Tipe Property</label>
+                  <label className={labelCls}>Tipe Properti</label>
                   <select
                     value={prop.property_type}
                     onChange={(e) =>
@@ -591,6 +507,7 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                     ))}
                   </select>
                 </div>
+
                 <div className="space-y-1">
                   <label className={labelCls}>Tipe Booking</label>
                   <select
@@ -608,6 +525,42 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div className="col-span-2 space-y-1">
+                  <label className={labelCls}>
+                    Lokasi <span className="text-red-500">*</span>
+                  </label>
+                  <MapPicker
+                    value={prop.lat !== null && prop.lng !== null ? { lat: prop.lat, lng: prop.lng } : null}
+                    onChange={handleMapPick}
+                    loading={geocoding}
+                  />
+                </div>
+
+                <div className="col-span-2 space-y-1">
+                  <label className={labelCls}>Alamat</label>
+                  <input
+                    value={prop.address}
+                    onChange={(e) => setProp((s) => ({ ...s, address: e.target.value }))}
+                    className={inputCls}
+                    placeholder="Pilih lokasi di peta, atau ketik manual"
+                  />
+                </div>
+
+                <div className="col-span-2 space-y-1">
+                  <label className={labelCls}>
+                    Deskripsi <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={prop.description}
+                    onChange={(e) =>
+                      setProp((s) => ({ ...s, description: e.target.value }))
+                    }
+                    className={cn(inputCls, "resize-none")}
+                    placeholder="Deskripsi properti"
+                  />
                 </div>
               </div>
 
@@ -641,7 +594,7 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                         </>
                       ) : (
                         <>
-                          <Hash size={13} /> Gunakan host ID
+                          <Users size={13} /> Pilih host
                         </>
                       )}
                     </button>
@@ -649,18 +602,61 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                 </div>
 
                 {prop.host_mode === "existing" ? (
-                  <div className="space-y-1">
-                    <label className={labelCls}>
-                      Host ID <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      value={prop.host_id}
-                      onChange={(e) =>
-                        setProp((s) => ({ ...s, host_id: e.target.value }))
-                      }
-                      className={inputCls}
-                      placeholder="UUID host yang sudah ada"
-                    />
+                  <div className="space-y-2">
+                    {/* search input */}
+                    <div className="flex items-center gap-2 rounded-lg border border-zinc-200 px-3 py-2 focus-within:border-primary-700">
+                      <Search size={13} className="shrink-0 text-zinc-400" />
+                      <input
+                        value={hostSearch}
+                        onChange={(e) => setHostSearch(e.target.value)}
+                        placeholder="Cari nama atau email host..."
+                        className="flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
+                      />
+                    </div>
+
+                    {/* host list */}
+                    <div className="max-h-52 overflow-y-auto rounded-lg border border-zinc-200 divide-y divide-zinc-100">
+                      {hosts.length === 0 ? (
+                        <p className="px-4 py-6 text-center text-xs text-zinc-400">
+                          {hostSearch ? "Host tidak ditemukan" : "Belum ada host"}
+                        </p>
+                      ) : (
+                        hosts.map((h: HostResponse) => {
+                          const initials = h.name
+                            .split(" ")
+                            .slice(0, 2)
+                            .map((w) => w[0])
+                            .join("")
+                            .toUpperCase();
+                          const selected = prop.host_id === h.id;
+                          return (
+                            <button
+                              key={h.id}
+                              type="button"
+                              onClick={() => setProp((s) => ({ ...s, host_id: h.id }))}
+                              className={cn(
+                                "flex w-full items-center gap-3 px-3 py-2.5 text-left transition",
+                                selected
+                                  ? "bg-primary-700/5 border-l-2 border-l-primary-700"
+                                  : "hover:bg-zinc-50",
+                              )}
+                            >
+                              <div className={cn(
+                                "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
+                                selected ? "bg-primary-700 text-white" : "bg-zinc-100 text-zinc-600",
+                              )}>
+                                {initials}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-zinc-800 truncate">{h.name}</p>
+                                <p className="text-xs text-zinc-400 truncate">{h.email}</p>
+                              </div>
+                              {selected && <Check size={14} className="ml-auto shrink-0 text-primary-700" />}
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-4 space-y-3">
@@ -806,8 +802,8 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
             </>
           )}
 
-          {/* ─ step 3 ─ */}
-          {step === 3 && (
+          {/* ─ step 2: kamar/unit ─ */}
+          {step === 2 && (
             <div className="space-y-4">
               {rentables.map((r, idx) => (
                 <div
@@ -970,20 +966,20 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
             </button>
           )}
 
-          {step < 3 ? (
+          {step < 2 ? (
             <button
               type="button"
               onClick={() => {
-                if (step === 1 && !canAdvanceStep1) {
-                  toast.error("Lengkapi judul, alamat, deskripsi, dan harga");
-                  return;
-                }
-                if (step === 2 && !canAdvanceStep2) {
-                  toast.error(
-                    prop.host_mode === "existing"
-                      ? "Masukkan Host ID"
-                      : "Lengkapi nama, email, dan no. telepon host",
-                  );
+                if (!canAdvanceStep1) {
+                  if (!prop.title.trim() || !prop.description.trim() || (!prop.address.trim() && prop.lat === null)) {
+                    toast.error("Lengkapi judul, alamat, dan deskripsi");
+                  } else {
+                    toast.error(
+                      prop.host_mode === "existing"
+                        ? "Masukkan Host ID"
+                        : "Lengkapi nama, email, dan no. telepon host",
+                    );
+                  }
                   return;
                 }
                 setStep((s) => s + 1);

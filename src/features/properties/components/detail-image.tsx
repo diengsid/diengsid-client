@@ -1,6 +1,6 @@
 "use client";
 
-import { ExperienceImage } from "@/features/experiences/schemas/experience-schema";
+import { PropertyImage } from "@/features/properties/schemas/schema-property";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, Grid2x2, X } from "lucide-react";
 import Image from "next/image";
@@ -8,7 +8,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 interface Props {
-  images?: ExperienceImage[];
+  images?: PropertyImage[];
 }
 
 // ─── lightbox ─────────────────────────────────────────────────────────────────
@@ -17,7 +17,7 @@ function Lightbox({
   images,
   onClose,
 }: {
-  images: ExperienceImage[];
+  images: PropertyImage[];
   onClose: () => void;
 }) {
   const [mode, setMode] = useState<"grid" | "detail">("grid");

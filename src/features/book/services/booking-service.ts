@@ -9,6 +9,7 @@ export type BookingCreateRequest = {
   quantity: number;
   guest_count: number;
   first_payment?: string;
+  phone_number: string;
 };
 
 export type BookingResponse = {

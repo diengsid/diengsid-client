@@ -6,12 +6,13 @@ import DateRangePicker, {
 import Button from "@/components/ui/button/button";
 import Modal from "@/components/ui/modal/modal";
 import Login from "@/features/auth/components/login";
+import { useCurrentUser } from "@/features/auth/hooks/use-auth";
 import { useFindProperty } from "@/features/properties/hooks/useFindProperty";
 import { useBookingCalculation } from "@/hooks/use-booking-calculation";
 import clsx from "clsx";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
-import { CalendarDays, Minus, Plus, Users, X } from "lucide-react";
+import { CalendarDays, Minus, Phone, Plus, Users, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,7 +22,7 @@ import { useCreateBooking } from "../hooks/useCreateBooking";
 
 interface Props {
   token: string;
-  experienceId: string;
+  propertyId: string;
   dateRange: DateRange;
   rentableId?: string;
 }
@@ -30,7 +31,7 @@ type Guests = { adult: number; child: number };
 
 export default function BookProperty({
   token,
-  experienceId,
+  propertyId,
   dateRange: initialDateRange,
   rentableId,
 }: Props): React.ReactNode {
@@ -48,9 +49,14 @@ export default function BookProperty({
   const [guests, setGuests] = useState<Guests>({ adult: 1, child: 0 });
   const [quantity, setQuantity] = useState(1);
   const [firstPayment, setFirstPayment] = useState<"FULL" | "DP">("FULL");
+  const [phoneOverride, setPhoneOverride] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const { data, isFetching } = useFindProperty(experienceId);
+  const { data: currentUser } = useCurrentUser(!!token);
+  const phoneNumber = phoneOverride ?? currentUser?.phone_number ?? "";
+  const setPhoneNumber = (v: string) => setPhoneOverride(v);
+
+  const { data, isFetching } = useFindProperty(propertyId);
   const property = data?.data;
   const rentable =
     property?.rentable.find((r) => r.id === rentableId) ??
@@ -97,11 +103,12 @@ export default function BookProperty({
         quantity,
         guest_count: totalGuests,
         first_payment: firstPayment,
+        phone_number: phoneNumber,
       },
       {
         onSuccess: (res) =>
           router.push(
-            `/book/confirmation/${res.data.id}?experience_id=${experienceId}`,
+            `/book/confirmation/${res.data.id}?property_id=${propertyId}`,
           ),
         onError: (err: unknown) => {
           setErrorMsg(
@@ -115,7 +122,11 @@ export default function BookProperty({
   };
 
   const canBook =
-    !!localDateRange.start && !!localDateRange.end && !!rentable && !isFetching;
+    !!localDateRange.start &&
+    !!localDateRange.end &&
+    !!rentable &&
+    !isFetching &&
+    phoneNumber.trim().length >= 8;
 
   // ── Guest helpers ────────────────────────────────────────────────────────────
   const updateGuest = (key: keyof Guests, delta: number) => {
@@ -124,7 +135,11 @@ export default function BookProperty({
       const next = prev[key] + delta;
       if (next < 0) return prev;
       if (key === "adult" && next < 1) return prev;
-      if (key !== "adult" && prev.adult + prev.child + delta > rentable.capacity) return prev;
+      if (
+        key !== "adult" &&
+        prev.adult + prev.child + delta > rentable.capacity
+      )
+        return prev;
       return { ...prev, [key]: next };
     });
   };
@@ -134,7 +149,7 @@ export default function BookProperty({
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-20 bg-white border-b">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href={`/properties/${experienceId}`}>
+          <Link href={`/properties/${propertyId}`}>
             <Button variant="ghost" size="sm">
               <X size={20} />
             </Button>
@@ -168,25 +183,29 @@ export default function BookProperty({
             {/* Property card */}
             <div className="flex gap-4 border rounded-xl p-4 items-center">
               <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-zinc-100">
-                {property?.experience.thumbnail_url && (
+                {(property?.thumbnail_url ??
+                  property?.images?.[0]?.image_url) && (
                   <Image
-                    src={property.experience.thumbnail_url}
-                    alt={property.experience.title}
+                    src={
+                      property.thumbnail_url ?? property.images![0].image_url
+                    }
+                    alt={property.title}
                     width={80}
                     height={80}
                     className="w-full h-full object-cover"
+                    unoptimized
                   />
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">
-                  {property?.experience.title ?? "Memuat..."}
+                  {property?.title ?? "Memuat..."}
                 </p>
                 <p className="text-sm text-zinc-500 mt-0.5">
                   {rentable?.name ?? "—"}
                 </p>
                 <p className="text-sm text-zinc-400 mt-0.5">
-                  {property?.experience.address}
+                  {property?.address}
                 </p>
               </div>
             </div>
@@ -269,10 +288,35 @@ export default function BookProperty({
               </div>
             </div>
 
+            {/* Phone number */}
+            <div className="border rounded-xl p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <Phone size={15} className="text-zinc-400 shrink-0" />
+                <p className="font-medium">Nomor WhatsApp</p>
+              </div>
+              <p className="text-sm text-zinc-500">
+                Konfirmasi booking akan dikirim ke nomor ini.
+              </p>
+              <div className="flex items-center gap-2 border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-zinc-900 mt-1">
+                <span className="bg-zinc-50 border-r px-3 py-2.5 text-sm text-zinc-500 shrink-0">
+                  +62
+                </span>
+                <input
+                  type="tel"
+                  placeholder="8xx xxxx xxxx"
+                  value={phoneNumber}
+                  onChange={(e) =>
+                    setPhoneNumber(e.target.value.replace(/\D/g, ""))
+                  }
+                  className="flex-1 px-3 py-2.5 text-sm outline-none bg-white"
+                />
+              </div>
+            </div>
+
             {/* Payment option */}
             <div className="border rounded-xl p-4 space-y-4">
               <p className="font-medium">Opsi pembayaran</p>
-              {(["FULL", "DP"] as const).map((opt) => (
+              {(["FULL"] as const).map((opt) => (
                 <label
                   key={opt}
                   className={clsx(
@@ -292,7 +336,8 @@ export default function BookProperty({
                   />
                   <div>
                     <p className="font-medium">
-                      {opt === "FULL" ? "Bayar penuh" : "Uang muka (DP 30%)"}
+                      Bayar Penuh
+                      {/* {opt === "FULL" ? "Bayar penuh" : "Uang muka (DP 30%)"} */}
                     </p>
                     <p className="text-sm text-zinc-500">
                       {opt === "FULL"
@@ -363,19 +408,23 @@ export default function BookProperty({
               {/* Property mini */}
               <div className="flex gap-3 items-center">
                 <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-zinc-100">
-                  {property?.experience.thumbnail_url && (
+                  {(property?.thumbnail_url ??
+                    property?.images?.[0]?.image_url) && (
                     <Image
-                      src={property.experience.thumbnail_url}
+                      src={
+                        property.thumbnail_url ?? property.images![0].image_url
+                      }
                       alt=""
                       width={64}
                       height={64}
                       className="w-full h-full object-cover"
+                      unoptimized
                     />
                   )}
                 </div>
                 <div className="min-w-0">
                   <p className="font-medium text-sm leading-snug line-clamp-2">
-                    {property?.experience.title}
+                    {property?.title}
                   </p>
                   <p className="text-xs text-zinc-400 mt-0.5">
                     {rentable?.name}
@@ -460,7 +509,7 @@ export default function BookProperty({
       </div>
 
       {/* ── Mobile sticky bottom ─────────────────────────────────────────────── */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t px-6 py-4 flex items-center justify-between gap-4">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t px-6 py-4 flex items-center justify-between gap-4 ">
         <div>
           <p className="text-xs text-zinc-400">
             {firstPayment === "DP" ? "Bayar sekarang" : "Total"}

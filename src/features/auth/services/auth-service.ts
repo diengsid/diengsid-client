@@ -13,6 +13,7 @@ export type CurrentUser = {
   id: string;
   name: string;
   email: string;
+  phone_number?: string;
   picture?: string;
   role: string;
   email_verified: boolean;
