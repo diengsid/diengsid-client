@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getAdminAllBookings } from "@/features/admin/services/admin-service";
-import { getExperiences } from "@/features/experiences/services/experience.service";
+import { getProperties } from "@/features/properties/services/property-service";
 import { BookingResponse } from "@/features/book/services/booking-service";
 import {
   Building2,
@@ -71,13 +71,13 @@ export default function AdminOverviewPage() {
     queryFn: getAdminAllBookings,
   });
 
-  const { data: experiencesData, isLoading: expLoading } = useQuery({
-    queryKey: ["experiences", {}],
-    queryFn: () => getExperiences({}),
+  const { data: propertiesData, isLoading: propertiesLoading } = useQuery({
+    queryKey: ["properties", {}],
+    queryFn: () => getProperties({}),
   });
 
   const bookings: BookingResponse[] = bookingsData?.data ?? [];
-  const experiences = experiencesData?.data ?? [];
+  const properties = propertiesData?.data ?? [];
 
   const totalRevenue = bookings
     .filter((b) => b.payment_status === "PAID")
@@ -91,7 +91,7 @@ export default function AdminOverviewPage() {
     .sort((a, b) => b.created_at - a.created_at)
     .slice(0, 8);
 
-  const isLoading = bookingsLoading || expLoading;
+  const isLoading = bookingsLoading || propertiesLoading;
 
   return (
     <div className="space-y-6">
@@ -103,8 +103,8 @@ export default function AdminOverviewPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
-          label="Total Experience"
-          value={isLoading ? "—" : experiences.length}
+          label="Total Properti"
+          value={isLoading ? "—" : properties.length}
           sub="Listing aktif"
           icon={Building2}
           color="bg-primary-700"

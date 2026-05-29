@@ -24,7 +24,7 @@ import { useGetPayment } from "../hooks/useGetPayment";
 
 interface Props {
   bookingId: string;
-  experienceId?: string;
+  propertyId?: string;
 }
 
 // ── Status config ──────────────────────────────────────────────────────────────
@@ -269,7 +269,7 @@ function NextStepsCard({ status }: { status: StatusKey }) {
 
 export default function BookingConfirmation({
   bookingId,
-  experienceId,
+  propertyId,
 }: Props) {
   const { data, isLoading } = useGetBooking(bookingId);
   const { mutate: createPayment, isPending: isCreatingPayment } =
@@ -407,8 +407,8 @@ export default function BookingConfirmation({
             >
               {isCreatingPayment ? "Memproses..." : "Bayar sekarang"}
             </Button>
-          ) : experienceId ? (
-            <Link href={`/properties/${experienceId}`} className="flex-1">
+          ) : propertyId ? (
+            <Link href={`/properties/${propertyId}`} className="flex-1">
               <Button className="w-full">Lihat properti</Button>
             </Link>
           ) : (

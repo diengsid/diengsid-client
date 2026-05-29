@@ -1,7 +1,7 @@
 "use client";
 import Button from "@/components/ui/button/button";
 import clsx from "clsx";
-import { Heart, Navigation, Search, User, type LucideIcon } from "lucide-react";
+import { Navigation, Search, User, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
@@ -18,11 +18,11 @@ const menuUnathorize: Menu[] = [
     path: "/",
     icon: Search,
   },
-  {
-    label: "Favorit",
-    path: "/wishlists",
-    icon: Heart,
-  },
+  // {
+  //   label: "Favorit",
+  //   path: "/wishlists",
+  //   icon: Heart,
+  // },
   {
     label: "Profile",
     path: "/profile",
@@ -40,13 +40,13 @@ export default function MenuBar({ token }: Props): React.ReactNode {
   const menu = !token
     ? menuUnathorize
     : [
-        ...menuUnathorize.slice(0, 2),
+        ...menuUnathorize.slice(0, 1),
         {
           label: "Perjalanan",
           path: "/journeys",
           icon: Navigation,
         },
-        ...menuUnathorize.slice(2),
+        ...menuUnathorize.slice(1),
       ];
 
   const isActive = (url: string) =>

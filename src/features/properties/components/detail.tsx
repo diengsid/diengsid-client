@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/preserve-manual-memoization */
 "use client";
 
+import { AmenityIcon } from "@/features/admin/components/amenity-icon";
 import { format } from "date-fns";
 import { DoorClosed, PenLine } from "lucide-react";
-import { AmenityIcon } from "@/features/admin/components/amenity-icon";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -185,7 +185,6 @@ export default function DetailProperty({
     const queryParams = new URLSearchParams({
       start_date: format(dateRange.start, "yyyy-MM-dd"),
       end_date: format(dateRange.end, "yyyy-MM-dd"),
-      experience_id: propertyId,
       rentable_id: rentableID,
     });
 
@@ -242,7 +241,7 @@ export default function DetailProperty({
     return (
       <>
         <h2 className="text-xl font-semibold">
-          {totalDays} malam di {property?.experience.title}
+          {totalDays} malam di {property?.title}
         </h2>
         <p className="text-sm text-gray-400 mt-2">
           {format(checkIn!, "EEEE, dd MMMM yyyy", { locale: id })} -{" "}
@@ -259,7 +258,7 @@ export default function DetailProperty({
     <div className="max-w-6xl mx-auto w-full">
       {/* Images */}
       <section id="photos">
-        <DetailImageProperty images={property?.experience.images} />
+        <DetailImageProperty images={property?.images} />
       </section>
 
       <div className="flex gap-x-20">
@@ -267,12 +266,12 @@ export default function DetailProperty({
         <div className="w-full bg-white rounded-t-3xl px-6 py-6 md:px-0">
           {/* TITLE */}
           <h1 className="text-2xl font-medium text-center md:text-left capitalize">
-            {property?.experience.title}
+            {property?.title}
           </h1>
 
           {/* ADDRESS */}
           <div className="text-center md:text-left mt-3 text-gray-500">
-            <p>{property?.experience.address}</p>
+            <p>{property?.address}</p>
             {/* <p className="text-sm">
               10 tamu · 3 kamar · 3 tempat tidur · 4 kamar mandi
             </p> */}
@@ -280,24 +279,26 @@ export default function DetailProperty({
 
           {/* HOST */}
           <div className="py-4 border-y mt-6 flex gap-4 items-center">
-            <Image
-              width={44}
-              height={44}
-              src="https://images.unsplash.com/photo-1723810742992-0e84241abcf5"
-              alt="host"
-              className="rounded-full object-cover"
-            />
+            <div className="w-11 h-11 rounded-full overflow-hidden shrink-0">
+              <Image
+                width={44}
+                height={44}
+                src={property?.host?.profile_picture_url || "/host_avatar.png"}
+                alt="host"
+                className="w-full h-full object-cover"
+              />
+            </div>
             <div>
-              <p className="font-medium">Tuan rumah: {property?.host.name}</p>
+              <p className="font-medium">Tuan rumah: {property?.host?.name}</p>
               <p className="text-sm text-gray-500">
-                Host teladan · 10 tahun pengalaman
+                Host teladan · beberapa tahun pengalaman
               </p>
             </div>
           </div>
 
           {/* DESCRIPTION */}
           <section className="mt-6 border-b pb-6">
-            <p className="font-light">{property?.experience.description}</p>
+            <p className="font-light">{property?.description}</p>
             <Button variant="link">Tampilkan lebih banyak</Button>
           </section>
 
@@ -323,7 +324,10 @@ export default function DetailProperty({
                     </p>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                       {items!.map((amenity) => (
-                        <div key={amenity.id} className="flex items-center gap-3">
+                        <div
+                          key={amenity.id}
+                          className="flex items-center gap-3"
+                        >
                           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-600">
                             <AmenityIcon icon={amenity.icon ?? ""} size={18} />
                           </div>
@@ -340,7 +344,7 @@ export default function DetailProperty({
           {/* ROOMS */}
           <section className="py-10 border-b" id="rooms">
             <h2 className="text-xl font-semibold mb-6">
-              Pilih kamar di {property?.experience.title}
+              Pilih kamar di {property?.title}
             </h2>
             <RoomList
               selectRentableId={rentableID}
@@ -401,7 +405,7 @@ export default function DetailProperty({
           </div>
         </div>
 
-        <div className="w-full fixed bg-white p-5 space-y-2 border-t bottom-0 left-0 md:hidden ">
+        <div className="w-full fixed bg-white p-5 space-y-2 border-t bottom-0 left-0 md:hidden z-[1000]">
           <div
             className="flex items-center gap-1 flex-wrap border-b"
             onClick={() => scrollToId("rooms")}
@@ -442,25 +446,19 @@ export default function DetailProperty({
       {/* MAP */}
       <section className="mt-6 border-b pb-6 px-6 md:px-0" id="locations">
         <h2 className="text-xl font-semibold">Lokasi</h2>
-        <p className="my-4">{property?.experience.address}</p>
+        <p className="my-4">{property?.address}</p>
 
-        {/* <MapViewer
-          center={[
-            property?.experience.lat ?? -7.205,
-            property?.experience.lng ?? 109.906,
-          ]}
-          zoom={12}
+        <MapViewer
+          center={[property?.lat ?? -7.205, property?.lng ?? 109.906]}
+          zoom={14}
           markers={[
             {
               id: "1",
-              position: [
-                property?.experience.lat ?? -7.205,
-                property?.experience.lng ?? 109.906,
-              ],
-              label: property?.experience.title,
+              position: [property?.lat ?? -7.205, property?.lng ?? 109.906],
+              label: property?.title,
             },
           ]}
-        /> */}
+        />
       </section>
       {/* Modal Book */}
       <Modal isOpen={modalBook} onClose={() => setModalBook(!modalBook)}>
@@ -470,7 +468,7 @@ export default function DetailProperty({
             <div className="flex justify-between">
               <p className="text-left">
                 {totalDays} malam x Rp.{" "}
-                {property?.experience.base_price.toLocaleString("id-ID")}
+                {rentable?.base_price.toLocaleString("id-ID")}
               </p>
               <p className="text-right">
                 Rp. {totalPrice.toLocaleString("id-ID")}
@@ -502,4 +500,3 @@ export default function DetailProperty({
     </div>
   );
 }
-

@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ experience_id?: string }>;
+  searchParams: Promise<{ property_id?: string }>;
 };
 
 export default async function BookingConfirmationPage({
@@ -14,7 +14,7 @@ export default async function BookingConfirmationPage({
   searchParams,
 }: Props) {
   const { id } = await params;
-  const { experience_id } = await searchParams;
+  const { property_id } = await searchParams;
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
@@ -23,7 +23,7 @@ export default async function BookingConfirmationPage({
   return (
     <>
       <Navbar token={token.value} />
-      <BookingConfirmation bookingId={id} experienceId={experience_id ?? ""} />;
+      <BookingConfirmation bookingId={id} propertyId={property_id ?? ""} />
       <Footer />
     </>
   );

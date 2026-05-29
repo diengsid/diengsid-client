@@ -9,7 +9,6 @@ type Props = {
   searchParams: Promise<{
     start_date?: string;
     end_date?: string;
-    experience_id?: string;
     rentable_id?: string;
   }>;
 };
@@ -19,7 +18,7 @@ export default async function BookingProperties({
   searchParams,
 }: Props) {
   const { id } = await params;
-  const { start_date, end_date, experience_id, rentable_id } = await searchParams;
+  const { start_date, end_date, rentable_id } = await searchParams;
   const checkInDate = parseLocalDate(start_date);
   const checkOutDate = parseLocalDate(end_date);
   const cookieStore = await cookies();
@@ -28,7 +27,7 @@ export default async function BookingProperties({
   return (
     <BookProperty
       token={token ?? ""}
-      experienceId={experience_id || id}
+      propertyId={id}
       dateRange={{ start: checkInDate, end: checkOutDate }}
       rentableId={rentable_id}
     />

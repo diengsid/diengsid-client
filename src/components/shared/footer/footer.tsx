@@ -90,7 +90,7 @@ export function Footer() {
         </div>
         <div className="mt-8 flex flex-col items-center justify-between border-t border-gray-200 pt-8 text-sm text-gray-600 md:flex-row">
           <div className="flex gap-4">
-            <span>© 2024 Dieng.id, Inc.</span>
+            <span>© 2026 Dieng.id, Inc.</span>
             <span>·</span>
             <a href="#" className="hover:underline">
               Privasi

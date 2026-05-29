@@ -48,7 +48,9 @@ export default function SearchBar({
   const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
 
-  const [active, setActive] = useState<"location" | "date" | "guests" | null>(null);
+  const [active, setActive] = useState<"location" | "date" | "guests" | null>(
+    null,
+  );
   const [location, setLocation] = useState(defaultLocation);
   const [dateRange, setDateRange] = useState<DateRange>({
     start: defaultCheckIn,
@@ -61,7 +63,8 @@ export default function SearchBar({
   // close on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setActive(null);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setActive(null);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -74,19 +77,21 @@ export default function SearchBar({
       const next = prev[key] + delta;
       const row = GUEST_ROWS.find((r) => r.key === key)!;
       if (next < row.min) return prev;
-      if (key !== "baby" && delta === 1 && prev.adult + prev.child >= 10) return prev;
+      if (key !== "baby" && delta === 1 && prev.adult + prev.child >= 10)
+        return prev;
       return { ...prev, [key]: next };
     });
   };
 
   // ── labels ────────────────────────────────────────────────────────────────
 
-  const dateLabel =
-    dateRange.start
-      ? `${format(dateRange.start, "d MMM", { locale: id })}${
-          dateRange.end ? ` – ${format(dateRange.end, "d MMM", { locale: id })}` : ""
-        }`
-      : null;
+  const dateLabel = dateRange.start
+    ? `${format(dateRange.start, "d MMM", { locale: id })}${
+        dateRange.end
+          ? ` – ${format(dateRange.end, "d MMM", { locale: id })}`
+          : ""
+      }`
+    : null;
 
   const totalGuests = guests.adult + guests.child;
   const guestLabel =
@@ -99,14 +104,16 @@ export default function SearchBar({
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (location.trim()) params.set("q", location.trim());
-    if (dateRange.start) params.set("check_in", format(dateRange.start, "yyyy-MM-dd"));
-    if (dateRange.end) params.set("check_out", format(dateRange.end, "yyyy-MM-dd"));
+    if (dateRange.start)
+      params.set("check_in", format(dateRange.start, "yyyy-MM-dd"));
+    if (dateRange.end)
+      params.set("check_out", format(dateRange.end, "yyyy-MM-dd"));
     params.set("adults", String(guests.adult));
     if (guests.child > 0) params.set("children", String(guests.child));
     if (guests.baby > 0) params.set("babies", String(guests.baby));
     setActive(null);
     onSearch?.();
-    router.push(`/search?${params.toString()}`);
+    router.push(`/search/homes?${params.toString()}`);
   };
 
   // ── section button helper ──────────────────────────────────────────────────
@@ -127,7 +134,12 @@ export default function SearchBar({
       )}
     >
       <span className="text-xs font-semibold text-zinc-900">{label}</span>
-      <span className={cn("truncate text-sm", value ? "text-zinc-800" : "text-zinc-400")}>
+      <span
+        className={cn(
+          "truncate text-sm",
+          value ? "text-zinc-800" : "text-zinc-400",
+        )}
+      >
         {value ?? placeholder}
       </span>
     </button>
@@ -154,7 +166,7 @@ export default function SearchBar({
           )}
         >
           <Search size={compact ? 16 : 18} />
-          {!compact && <span className="hidden md:inline">Cari</span>}
+          {/* {!compact && <span className="hidden md:inline">Cari</span>} */}
         </button>
       </div>
 
@@ -217,7 +229,9 @@ export default function SearchBar({
             {GUEST_ROWS.map((row) => (
               <div key={row.key} className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-zinc-900">{row.label}</p>
+                  <p className="text-sm font-semibold text-zinc-900">
+                    {row.label}
+                  </p>
                   <p className="text-xs text-zinc-500">{row.sub}</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -229,11 +243,15 @@ export default function SearchBar({
                   >
                     <Minus size={14} />
                   </button>
-                  <span className="w-4 text-center text-sm font-medium">{guests[row.key]}</span>
+                  <span className="w-4 text-center text-sm font-medium">
+                    {guests[row.key]}
+                  </span>
                   <button
                     type="button"
                     onClick={() => updateGuest(row.key, 1)}
-                    disabled={row.key !== "baby" && guests.adult + guests.child >= 10}
+                    disabled={
+                      row.key !== "baby" && guests.adult + guests.child >= 10
+                    }
                     className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-300 text-zinc-700 transition hover:border-zinc-500 disabled:cursor-not-allowed disabled:opacity-30"
                   >
                     <Plus size={14} />
