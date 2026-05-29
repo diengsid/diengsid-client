@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { Footer } from "@/components/shared/footer/footer";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";
 import Navbar from "@/components/shared/navbar/navbar";
 import ProfilePage from "@/features/auth/components/profile-page";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Profil Saya",
+  robots: { index: false, follow: false },
+};
 
 export default async function Profile() {
   const cookieStore = await cookies();

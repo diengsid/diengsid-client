@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";
 import Navbar from "@/components/shared/navbar/navbar";
 import SearchPageContent from "@/features/properties/components/search-page-content";
@@ -10,6 +11,13 @@ import {
 } from "@tanstack/react-query";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Cari Penginapan di Dieng",
+  description:
+    "Cari penginapan di kawasan Dieng Wonosobo — temukan villa, homestay, dan berbagai pilihan terbaik.",
+  robots: { index: false, follow: false },
+};
 
 type SearchParams = {
   q?: string;
