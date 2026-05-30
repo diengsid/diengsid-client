@@ -1,8 +1,13 @@
 import { AttractionGrid } from "@/features/attractions/components/attraction-grid";
-import { AttractionResponse } from "@/features/admin/services/attraction-service";
+import { getAttractions } from "@/features/attractions/services/attraction-service";
 import { Footer } from "@/components/shared/footer/footer";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";
 import Navbar from "@/components/shared/navbar/navbar";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 
@@ -28,24 +33,18 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://diengs.id/wisata" },
 };
 
-async function fetchAttractions(): Promise<AttractionResponse[]> {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/tourist-attractions`,
-      { next: { revalidate: 3600 } },
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.data ?? [];
-  } catch {
-    return [];
-  }
-}
-
 export default async function WisataPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
-  const attractions = await fetchAttractions();
+
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ["attractions"],
+    queryFn: getAttractions,
+  });
+
+  const dehydratedState = dehydrate(queryClient);
 
   return (
     <>
@@ -65,7 +64,9 @@ export default async function WisataPage() {
       </section>
 
       <main className="container mx-auto max-w-6xl px-4 pb-16 pt-8">
-        <AttractionGrid attractions={attractions} />
+        <HydrationBoundary state={dehydratedState}>
+          <AttractionGrid />
+        </HydrationBoundary>
       </main>
 
       <Footer />

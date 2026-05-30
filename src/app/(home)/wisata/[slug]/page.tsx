@@ -1,5 +1,5 @@
 import { AttractionMap } from "@/features/attractions/components/attraction-map";
-import { AttractionResponse } from "@/features/admin/services/attraction-service";
+import { Attraction } from "@/features/attractions/schemas/schema-attraction";
 import { Property } from "@/features/properties/schemas/schema-property";
 import { Footer } from "@/components/shared/footer/footer";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";
@@ -35,7 +35,7 @@ const CATEGORY_COLOR: Record<string, string> = {
 
 // ── Server fetch helpers ──────────────────────────────────────────────────────
 
-async function fetchAttractions(): Promise<AttractionResponse[]> {
+async function fetchAttractions(): Promise<Attraction[]> {
   try {
     const res = await fetch(`${API_URL}/api/tourist-attractions`, {
       next: { revalidate: 3600 },

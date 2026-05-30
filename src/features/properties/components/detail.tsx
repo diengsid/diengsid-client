@@ -2,7 +2,7 @@
 "use client";
 
 import { AmenityIcon } from "@/features/admin/components/amenity-icon";
-import { getNearbyAttractions } from "@/features/admin/services/attraction-service";
+import { getNearbyAttractions } from "@/features/attractions/services/attraction-service";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Clock, DoorClosed, MapPin, PenLine, Ruler } from "lucide-react";
@@ -167,7 +167,7 @@ export default function DetailProperty({
 
           {/* right sidebar skeleton */}
           <div className="hidden md:block mt-10 shrink-0">
-            <div className="w-[350px] rounded-2xl border border-zinc-100 p-7 space-y-4">
+            <div className="w-87.5 rounded-2xl border border-zinc-100 p-7 space-y-4">
               <div className="h-6 w-40 rounded-lg bg-zinc-200" />
               <div className="h-4 w-24 rounded-lg bg-zinc-200" />
               <div className="h-12 w-full rounded-xl bg-zinc-200" />
@@ -329,7 +329,7 @@ export default function DetailProperty({
                   ),
                 ).map(([category, items]) => (
                   <div key={category}>
-                    <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 capitalize">
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
                       {category}
                     </p>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -375,7 +375,7 @@ export default function DetailProperty({
 
         {/* RIGHT BOOKING */}
         <div className="hidden md:block mt-10">
-          <div className="w-[350px] shadow-custom-lg rounded-2xl p-7 sticky top-24">
+          <div className="w-87.5 shadow-custom-lg rounded-2xl p-7 sticky top-24">
             <div
               className="cursor-pointer"
               onClick={() => setModalBook(!modalBook)}
@@ -415,7 +415,7 @@ export default function DetailProperty({
           </div>
         </div>
 
-        <div className="w-full fixed bg-white p-5 space-y-2 border-t bottom-0 left-0 md:hidden z-[1000]">
+        <div className="w-full fixed bg-white p-5 space-y-2 border-t bottom-0 left-0 md:hidden z-1000">
           <div
             className="flex items-center gap-1 flex-wrap border-b"
             onClick={() => scrollToId("rooms")}

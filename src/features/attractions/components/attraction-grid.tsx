@@ -1,6 +1,7 @@
 "use client";
 
-import { AttractionResponse } from "@/features/admin/services/attraction-service";
+import { useGetAttractions } from "@/features/attractions/hooks/useGetAttractions";
+import { Attraction } from "@/features/attractions/schemas/schema-attraction";
 import { cn } from "@/lib/utils";
 import { MapPin, Search } from "lucide-react";
 import Image from "next/image";
@@ -27,7 +28,21 @@ const CATEGORY_COLOR: Record<string, string> = {
   hiburan: "bg-pink-100 text-pink-700",
 };
 
-function AttractionCard({ a }: { a: AttractionResponse }) {
+function AttractionCardSkeleton() {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+      <div className="h-44 w-full animate-pulse bg-zinc-100" />
+      <div className="flex flex-col gap-2 p-4">
+        <div className="h-4 w-3/4 animate-pulse rounded-lg bg-zinc-100" />
+        <div className="h-3 w-1/2 animate-pulse rounded-lg bg-zinc-100" />
+        <div className="h-3 w-full animate-pulse rounded-lg bg-zinc-100" />
+        <div className="h-3 w-5/6 animate-pulse rounded-lg bg-zinc-100" />
+      </div>
+    </div>
+  );
+}
+
+function AttractionCard({ a }: { a: Attraction }) {
   const colorCls = CATEGORY_COLOR[a.category ?? ""] ?? "bg-zinc-100 text-zinc-600";
 
   return (
@@ -35,7 +50,6 @@ function AttractionCard({ a }: { a: AttractionResponse }) {
       href={`/wisata/${a.slug}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm hover:shadow-md transition-shadow"
     >
-      {/* Image */}
       <div className="relative h-44 w-full overflow-hidden bg-zinc-100">
         {a.image_url ? (
           <Image
@@ -62,7 +76,6 @@ function AttractionCard({ a }: { a: AttractionResponse }) {
         )}
       </div>
 
-      {/* Content */}
       <div className="flex flex-1 flex-col gap-1.5 p-4">
         <h3 className="font-semibold text-zinc-900 line-clamp-1 group-hover:text-primary-700 transition-colors">
           {a.name}
@@ -84,16 +97,18 @@ function AttractionCard({ a }: { a: AttractionResponse }) {
   );
 }
 
-export function AttractionGrid({ attractions }: { attractions: AttractionResponse[] }) {
+export function AttractionGrid() {
+  const { data, isFetching } = useGetAttractions();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+
+  const attractions = data?.data ?? [];
 
   const filtered = attractions.filter((a) => {
     const matchSearch =
       a.name.toLowerCase().includes(search.toLowerCase()) ||
       (a.address ?? "").toLowerCase().includes(search.toLowerCase());
-    const matchCat =
-      activeCategory === "all" || a.category === activeCategory;
+    const matchCat = activeCategory === "all" || a.category === activeCategory;
     return matchSearch && matchCat;
   });
 
@@ -143,7 +158,13 @@ export function AttractionGrid({ attractions }: { attractions: AttractionRespons
       </div>
 
       {/* Grid */}
-      {filtered.length === 0 ? (
+      {isFetching ? (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <AttractionCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-zinc-200 py-20 text-center text-zinc-400">
           Tidak ada wisata ditemukan
         </div>
