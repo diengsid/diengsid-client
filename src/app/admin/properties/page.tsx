@@ -1,11 +1,12 @@
 "use client";
 
 import { CreateListingWizard } from "@/features/admin/components/create-listing-wizard";
+import { SetAttractionsModal } from "@/features/admin/components/set-attractions-modal";
 import { Property } from "@/features/properties/schemas/schema-property";
 import { getProperties } from "@/features/properties/services/property-service";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { Building2, ImageIcon, Plus, Search } from "lucide-react";
+import { Building2, ImageIcon, Landmark, Plus, Search } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -18,7 +19,15 @@ const PROPERTY_TYPES = [
   "guesthouse",
 ];
 
-function PropertyRow({ property: p }: { property: Property }) {
+type SelectedProperty = { id: string; title: string };
+
+function PropertyRow({
+  property: p,
+  onSetAttraction,
+}: {
+  property: Property;
+  onSetAttraction: (p: SelectedProperty) => void;
+}) {
   const minPrice = p.rentable?.length
     ? Math.min(...p.rentable.map((r) => r.base_price))
     : null;
@@ -63,9 +72,17 @@ function PropertyRow({ property: p }: { property: Property }) {
         {p.rentable?.length ?? 0}
       </td>
       <td className="px-5 py-3 text-right font-medium text-zinc-900">
-        {minPrice !== null
-          ? `Rp ${minPrice.toLocaleString("id-ID")}`
-          : "-"}
+        {minPrice !== null ? `Rp ${minPrice.toLocaleString("id-ID")}` : "-"}
+      </td>
+      <td className="px-5 py-3 text-right">
+        <button
+          onClick={() => onSetAttraction({ id: p.id, title: p.title })}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 hover:border-zinc-300 transition"
+          title="Set atraksi wisata terdekat"
+        >
+          <Landmark size={13} />
+          Atraksi
+        </button>
       </td>
     </tr>
   );
@@ -73,6 +90,8 @@ function PropertyRow({ property: p }: { property: Property }) {
 
 export default function PropertiesPage() {
   const [showWizard, setShowWizard] = useState(false);
+  const [selectedProperty, setSelectedProperty] =
+    useState<SelectedProperty | null>(null);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
 
@@ -157,13 +176,16 @@ export default function PropertiesPage() {
                 <th className="px-5 py-3 text-right font-medium text-zinc-500">
                   Harga Mulai
                 </th>
+                <th className="px-5 py-3 text-right font-medium text-zinc-500">
+                  Aksi
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i}>
-                    {Array.from({ length: 5 }).map((_, j) => (
+                    {Array.from({ length: 6 }).map((_, j) => (
                       <td key={j} className="px-5 py-3">
                         <div className="h-4 w-28 animate-pulse rounded bg-zinc-100" />
                       </td>
@@ -173,7 +195,7 @@ export default function PropertiesPage() {
               ) : filtered.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="px-5 py-10 text-center text-zinc-400"
                   >
                     <Building2
@@ -184,7 +206,13 @@ export default function PropertiesPage() {
                   </td>
                 </tr>
               ) : (
-                filtered.map((p) => <PropertyRow key={p.id} property={p} />)
+                filtered.map((p) => (
+                  <PropertyRow
+                    key={p.id}
+                    property={p}
+                    onSetAttraction={setSelectedProperty}
+                  />
+                ))
               )}
             </tbody>
           </table>
@@ -193,6 +221,14 @@ export default function PropertiesPage() {
 
       {showWizard && (
         <CreateListingWizard onClose={() => setShowWizard(false)} />
+      )}
+
+      {selectedProperty && (
+        <SetAttractionsModal
+          propertyId={selectedProperty.id}
+          propertyTitle={selectedProperty.title}
+          onClose={() => setSelectedProperty(null)}
+        />
       )}
     </div>
   );

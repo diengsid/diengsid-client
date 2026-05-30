@@ -2,10 +2,13 @@
 "use client";
 
 import { AmenityIcon } from "@/features/admin/components/amenity-icon";
+import { getNearbyAttractions } from "@/features/admin/services/attraction-service";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { DoorClosed, PenLine } from "lucide-react";
+import { Clock, DoorClosed, MapPin, PenLine, Ruler } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -81,6 +84,13 @@ export default function DetailProperty({
     hasDiscount,
     isReady,
   } = useBookingCalculation({ dateRange, rentable });
+
+  const { data: nearbyData } = useQuery({
+    queryKey: ["nearby-attractions", propertyId],
+    queryFn: () => getNearbyAttractions(propertyId),
+    enabled: !!propertyId,
+  });
+  const nearbyAttractions = nearbyData?.data ?? [];
 
   const [modalBook, setModalBook] = useState<boolean>(false);
 
@@ -460,6 +470,65 @@ export default function DetailProperty({
           ]}
         />
       </section>
+      {/* NEARBY ATTRACTIONS */}
+      {nearbyAttractions.length > 0 && (
+        <section className="mt-6 border-b pb-8 px-6 md:px-0">
+          <h2 className="text-xl font-semibold mb-5">Wisata Terdekat</h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {nearbyAttractions.map(({ attraction: a, distance_km, duration_minutes }) => (
+              <Link
+                key={a.id}
+                href={`/wisata/${a.slug}`}
+                className="group flex gap-3 rounded-xl border border-zinc-200 bg-white p-3 hover:shadow-md transition-shadow"
+              >
+                {/* Thumbnail */}
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+                  {a.image_url ? (
+                    <Image
+                      fill
+                      src={a.image_url}
+                      alt={a.name}
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <MapPin size={20} className="text-zinc-300" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-zinc-900 line-clamp-1 text-sm group-hover:text-primary-700 transition-colors">
+                    {a.name}
+                  </p>
+                  {a.category && (
+                    <span className="mt-0.5 inline-block rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] capitalize text-zinc-500">
+                      {a.category}
+                    </span>
+                  )}
+                  <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+                    {distance_km != null && (
+                      <span className="flex items-center gap-1 text-xs text-zinc-400">
+                        <Ruler size={11} />
+                        {distance_km} km
+                      </span>
+                    )}
+                    {duration_minutes != null && (
+                      <span className="flex items-center gap-1 text-xs text-zinc-400">
+                        <Clock size={11} />
+                        {duration_minutes} menit
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Modal Book */}
       <Modal isOpen={modalBook} onClose={() => setModalBook(!modalBook)}>
         <div className="space-y-5">

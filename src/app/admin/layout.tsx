@@ -6,6 +6,7 @@ import {
   CalendarDays,
   ChevronLeft,
   LayoutDashboard,
+  Landmark,
   Menu,
   Sparkles,
   Users,
@@ -18,6 +19,7 @@ import { useState } from "react";
 const navItems = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/properties", label: "Properties", icon: Building2 },
+  { href: "/admin/tourist-attractions", label: "Attractions", icon: Landmark },
   { href: "/admin/bookings", label: "Bookings", icon: CalendarDays },
   { href: "/admin/amenities", label: "Amenities", icon: Sparkles },
   { href: "/admin/users", label: "Users", icon: Users },

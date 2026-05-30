@@ -36,7 +36,7 @@ interface Props {
 }
 
 type MobileSection = "location" | "date" | "guests" | null;
-type Category = "penginapan" | "pengalaman" | "layanan";
+type Category = "penginapan" | "pengalaman" | "layanan" | "wisata";
 type Guests = { adult: number; child: number; baby: number };
 
 const CATEGORIES: {
@@ -46,6 +46,7 @@ const CATEGORIES: {
   isNew?: boolean;
 }[] = [
   { key: "penginapan", label: "Penginapan", href: "/" },
+  { key: "wisata", label: "Wisata", href: "/wisata" },
   {
     key: "pengalaman",
     label: "Pengalaman",
