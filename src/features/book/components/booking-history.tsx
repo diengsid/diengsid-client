@@ -34,7 +34,7 @@ function formatPrice(amount: number) {
 
 export default function BookingHistory(): React.ReactNode {
   const { data, isLoading, isError } = useGetMyBookings();
-  const bookings = data?.data ?? [];
+  const bookings = Array.isArray(data?.data) ? data.data : [];
 
   if (isLoading) {
     return (

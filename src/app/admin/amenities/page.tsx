@@ -11,7 +11,7 @@ import {
 import { Plus, Search, X, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
-import { AMENITY_ICONS, ICON_KEYS, AmenityIcon } from "@/features/admin/components/amenity-icon";
+import { ICON_KEYS, AmenityIcon } from "@/features/admin/components/amenity-icon";
 
 const CATEGORIES = ["umum", "kamar", "dapur", "outdoor", "keamanan", "lainnya"];
 
@@ -38,7 +38,7 @@ function CreateModal({ onClose }: { onClose: () => void }) {
     onError: (err: Error) => toast.error(err.message ?? "Gagal menambahkan amenity"),
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     mutation.mutate(form);
   };
@@ -183,7 +183,7 @@ export default function AmenitiesPage() {
     queryFn: getAmenities,
   });
 
-  const amenities: AmenityResponse[] = data?.data ?? [];
+  const amenities: AmenityResponse[] = Array.isArray(data?.data) ? data.data : [];
 
   const filtered = amenities.filter((a) => {
     const matchSearch = a.name.toLowerCase().includes(search.toLowerCase());

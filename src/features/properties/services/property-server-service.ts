@@ -20,7 +20,7 @@ export async function serverGetProperties(
 ): Promise<ResponseData<Property[]>> {
   const qs = buildPropertyParams(search);
   const data = await serverFetch<Property[]>(`/properties?${qs}`);
-  return { success: true, message: "ok", data: data ?? [] };
+  return { success: true, message: "ok", data: Array.isArray(data) ? data : [] };
 }
 
 export async function serverDetailProperty(

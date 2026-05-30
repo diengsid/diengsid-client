@@ -4,5 +4,5 @@ import { Attraction } from "../schemas/schema-attraction";
 
 export async function serverGetAttractions(): Promise<ResponseData<Attraction[]>> {
   const data = await serverFetch<Attraction[]>("/tourist-attractions");
-  return { success: true, message: "ok", data: data ?? [] };
+  return { success: true, message: "ok", data: Array.isArray(data) ? data : [] };
 }

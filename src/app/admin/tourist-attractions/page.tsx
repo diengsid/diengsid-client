@@ -95,7 +95,7 @@ function CreateModal({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!form.name.trim() || !form.slug.trim()) {
       toast.error("Nama dan slug wajib diisi");
@@ -294,7 +294,7 @@ export default function TouristAttractionsPage() {
     queryFn: getAttractions,
   });
 
-  const attractions = data?.data ?? [];
+  const attractions = Array.isArray(data?.data) ? data.data : [];
   const filtered = attractions.filter((a) => {
     const matchSearch =
       a.name.toLowerCase().includes(search.toLowerCase()) ||

@@ -34,7 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .then((res) => (res.ok ? res.json() : null))
       .then((json) => {
         const items: Array<{ id: string; updated_at: number }> =
-          json?.data ?? [];
+          Array.isArray(json?.data) ? json.data : [];
         propertyPages = items.map((p) => ({
           url: `${SITE_URL}/penginapan/${p.id}`,
           lastModified: toLastModified(p.updated_at),
@@ -51,7 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .then((res) => (res.ok ? res.json() : null))
       .then((json) => {
         const items: Array<{ slug: string; updated_at: number }> =
-          json?.data ?? [];
+          Array.isArray(json?.data) ? json.data : [];
         attractionPages = items.map((a) => ({
           url: `${SITE_URL}/wisata/${a.slug}`,
           lastModified: toLastModified(a.updated_at),

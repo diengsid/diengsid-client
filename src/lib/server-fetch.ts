@@ -33,7 +33,11 @@ export async function serverFetch<T>(
     });
     if (!res.ok) return null;
     const json = await res.json();
-    return (json.data ?? json) as T;
+    // If the backend wraps data in { data: T }, return json.data (even if null).
+    // null is handled by callers via `?? []` fallback.
+    // Returning (json.data ?? json) was wrong: null ?? json returns the full object.
+    const data = Object.hasOwn(json, "data") ? json.data : json;
+    return data as T;
   } catch (err) {
     console.error(`[serverFetch] ${path}`, err instanceof Error ? err.message : err);
     return null;

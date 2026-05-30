@@ -51,7 +51,7 @@ export default function SearchPageContent({
   checkOut,
 }: Props) {
   const { data, isFetching } = useGetProperties(search);
-  const properties = data?.data ?? [];
+  const properties = Array.isArray(data?.data) ? data.data : [];
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [showMobileMap, setShowMobileMap] = useState(false);
 

@@ -45,8 +45,8 @@ export function SetAttractionsModal({
 
   // Pre-fill rows when both datasets are ready
   useEffect(() => {
-    const all = allData?.data ?? [];
-    const nearby = nearbyData?.data ?? [];
+    const all = Array.isArray(allData?.data) ? allData.data : [];
+    const nearby = Array.isArray(nearbyData?.data) ? nearbyData.data : [];
 
     const initial: Record<string, RowState> = {};
     all.forEach((a) => {

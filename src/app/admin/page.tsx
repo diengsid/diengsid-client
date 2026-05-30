@@ -76,8 +76,8 @@ export default function AdminOverviewPage() {
     queryFn: () => getProperties({}),
   });
 
-  const bookings: BookingResponse[] = bookingsData?.data ?? [];
-  const properties = propertiesData?.data ?? [];
+  const bookings: BookingResponse[] = Array.isArray(bookingsData?.data) ? bookingsData.data : [];
+  const properties = Array.isArray(propertiesData?.data) ? propertiesData.data : [];
 
   const totalRevenue = bookings
     .filter((b) => b.payment_status === "PAID")

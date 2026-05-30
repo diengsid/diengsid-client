@@ -187,7 +187,7 @@ export default function BookingsPage() {
     queryFn: getAdminAllBookings,
   });
 
-  const bookings: BookingResponse[] = data?.data ?? [];
+  const bookings: BookingResponse[] = Array.isArray(data?.data) ? data.data : [];
 
   const filtered = bookings.filter((b) => {
     const matchSearch =

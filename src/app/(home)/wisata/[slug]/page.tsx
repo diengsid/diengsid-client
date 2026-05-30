@@ -35,15 +35,15 @@ const CATEGORY_COLOR: Record<string, string> = {
 // ── Server fetch helpers ──────────────────────────────────────────────────────
 
 async function fetchAttractions(): Promise<Attraction[]> {
-  return (await serverFetch<Attraction[]>("/tourist-attractions")) ?? [];
+  const data = await serverFetch<Attraction[]>("/tourist-attractions");
+  return Array.isArray(data) ? data : [];
 }
 
 async function fetchNearbyProperties(attractionId: string): Promise<Property[]> {
-  return (
-    (await serverFetch<Property[]>(
-      `/properties?attraction_id=${attractionId}&page=1&size=6`,
-    )) ?? []
+  const data = await serverFetch<Property[]>(
+    `/properties?attraction_id=${attractionId}&page=1&size=6`,
   );
+  return Array.isArray(data) ? data : [];
 }
 
 // ── Metadata ─────────────────────────────────────────────────────────────────

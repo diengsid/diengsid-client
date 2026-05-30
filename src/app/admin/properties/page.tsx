@@ -100,7 +100,7 @@ export default function PropertiesPage() {
     queryFn: () => getProperties({ page: 1, size: 200 }),
   });
 
-  const properties = data?.data ?? [];
+  const properties = Array.isArray(data?.data) ? data.data : [];
 
   const filtered = properties.filter((p) => {
     const matchSearch =

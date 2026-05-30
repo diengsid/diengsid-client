@@ -19,13 +19,13 @@ export default function PropertyList({ search }: Props) {
         ? Array.from({ length: skeletonCount }).map((_, i) => (
             <CardSkeleton key={i} />
           ))
-        : data?.data?.length === 0
+        : !Array.isArray(data?.data) || data.data.length === 0
           ? (
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
               <p className="text-base">Tidak ada properti yang ditemukan.</p>
             </div>
           )
-          : data?.data?.map((item: Property) => (
+          : data.data.map((item: Property) => (
               <PropertyItemCard property={item} key={item.id} />
             ))}
     </div>
