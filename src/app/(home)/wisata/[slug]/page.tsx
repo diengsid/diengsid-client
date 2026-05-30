@@ -38,13 +38,14 @@ const CATEGORY_COLOR: Record<string, string> = {
 // ── Server fetch helpers ──────────────────────────────────────────────────────
 
 async function fetchAttractions(): Promise<Attraction[]> {
-  const data = await serverFetch<Attraction[]>("/tourist-attractions");
+  const data = await serverFetch<Attraction[]>("/tourist-attractions", { revalidate: 0 });
   return Array.isArray(data) ? data : [];
 }
 
 async function fetchNearbyProperties(attractionId: string): Promise<Property[]> {
   const data = await serverFetch<Property[]>(
     `/properties?attraction_id=${attractionId}&page=1&size=6`,
+    { revalidate: 0 },
   );
   return Array.isArray(data) ? data : [];
 }

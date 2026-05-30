@@ -27,10 +27,14 @@ export async function serverFetch<T>(
 ): Promise<T | null> {
   try {
     const url = `${SERVER_API_URL}/api${path}`;
-    const res = await fetch(url, {
-      ...init,
-      next: { revalidate, ...(tags ? { tags } : {}) },
-    });
+    // revalidate: 0 → bypass Data Cache entirely (cache: "no-store").
+    // Explicit next: { revalidate } overrides force-dynamic, so we must
+    // use cache: "no-store" here instead of next: { revalidate: 0 }.
+    const cacheOptions: RequestInit =
+      revalidate === 0
+        ? { cache: "no-store" }
+        : { next: { revalidate, ...(tags ? { tags } : {}) } };
+    const res = await fetch(url, { ...init, ...cacheOptions });
     if (!res.ok) return null;
     const json = await res.json();
     // If the backend wraps data in { data: T }, return json.data (even if null).

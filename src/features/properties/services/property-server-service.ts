@@ -19,14 +19,14 @@ export async function serverGetProperties(
   search: SearchPropertyRequest,
 ): Promise<ResponseData<Property[]>> {
   const qs = buildPropertyParams(search);
-  const data = await serverFetch<Property[]>(`/properties?${qs}`);
+  const data = await serverFetch<Property[]>(`/properties?${qs}`, { revalidate: 0 });
   return { success: true, message: "ok", data: Array.isArray(data) ? data : [] };
 }
 
 export async function serverDetailProperty(
   id: string,
 ): Promise<ResponseData<Property> | null> {
-  const data = await serverFetch<Property>(`/properties/${id}`);
+  const data = await serverFetch<Property>(`/properties/${id}`, { revalidate: 0 });
   if (!data) return null;
   return { success: true, message: "ok", data };
 }
