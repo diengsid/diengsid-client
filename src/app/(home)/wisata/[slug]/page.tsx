@@ -14,6 +14,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MapPin, ChevronRight, Clock, Ruler } from "lucide-react";
 
+// Always render fresh — new attractions must be visible immediately after creation.
+export const dynamic = "force-dynamic";
+
 const CATEGORY_LABEL: Record<string, string> = {
   alam: "Alam",
   budaya: "Budaya",

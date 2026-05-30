@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/shared/json-ld";
 import Categories from "@/components/shared/categories/categories";
+export const dynamic = "force-dynamic";
 import { Footer } from "@/components/shared/footer/footer";
 import ForbiddenToast from "@/components/shared/forbidden-toast/forbidden-toast";
 import { Hero } from "@/components/shared/hero/hero";

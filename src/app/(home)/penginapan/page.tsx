@@ -1,6 +1,8 @@
 import Categories from "@/components/shared/categories/categories";
 import { Footer } from "@/components/shared/footer/footer";
 import ForbiddenToast from "@/components/shared/forbidden-toast/forbidden-toast";
+
+export const dynamic = "force-dynamic";
 import { Hero } from "@/components/shared/hero/hero";
 import { JsonLd } from "@/components/shared/json-ld";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";

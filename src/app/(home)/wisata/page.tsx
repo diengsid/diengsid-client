@@ -1,5 +1,7 @@
 import { AttractionGrid } from "@/features/attractions/components/attraction-grid";
 import { serverGetAttractions } from "@/features/attractions/services/attraction-server-service";
+
+export const dynamic = "force-dynamic";
 import { Footer } from "@/components/shared/footer/footer";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";
 import Navbar from "@/components/shared/navbar/navbar";

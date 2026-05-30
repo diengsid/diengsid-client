@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";
 import Navbar from "@/components/shared/navbar/navbar";
+
+export const dynamic = "force-dynamic";
 import SearchPageContent from "@/features/properties/components/search-page-content";
 import { SearchPropertyRequest } from "@/features/properties/schemas/schema-property";
 import { serverGetProperties } from "@/features/properties/services/property-server-service";

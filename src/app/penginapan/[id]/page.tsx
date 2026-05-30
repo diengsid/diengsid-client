@@ -1,6 +1,8 @@
 import { JsonLd } from "@/components/shared/json-ld";
 import { Footer } from "@/components/shared/footer/footer";
 import Navbar from "@/components/shared/navbar/navbar";
+
+export const dynamic = "force-dynamic";
 import DetailProperty from "@/features/properties/components/detail";
 import NavItem from "@/features/properties/components/nav-detail";
 import NavbarDetailProperty from "@/features/properties/components/navbar";
