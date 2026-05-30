@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -15,7 +16,6 @@ import {
   RotateCw,
 } from "lucide-react";
 import { useEffect } from "react";
-import { cn } from "@/lib/utils";
 
 type Props = {
   value: string;
@@ -85,7 +85,7 @@ export function RichTextEditor({ value, onChange, placeholder }: Props) {
     if (!editor) return;
     const current = editor.getHTML();
     if (value !== current) {
-      editor.commands.setContent(value || "", false);
+      editor.commands.setContent(value || "", { emitUpdate: false });
     }
   }, [value, editor]);
 
