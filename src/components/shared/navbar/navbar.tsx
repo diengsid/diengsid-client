@@ -82,7 +82,7 @@ function CompactPill({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex items-center gap-0 rounded-full border border-zinc-300 bg-white shadow-sm hover:shadow-md transition-shadow active:scale-[0.98]",
+        "flex cursor-pointer items-center gap-0 rounded-full border border-zinc-300 bg-white shadow-sm hover:shadow-md transition-shadow active:scale-[0.98]",
         className,
       )}
     >
@@ -280,7 +280,7 @@ export default function Navbar({
                     router.push(cat.href);
                   }}
                   className={cn(
-                    "rounded-full px-3 py-1.5 text-sm font-medium transition",
+                    "cursor-pointer rounded-full hover:text-primary px-3 py-1.5 text-sm font-medium transition",
                     activeCategory === cat.key
                       ? "bg-zinc-900 text-white"
                       : "text-zinc-500 hover:bg-zinc-100",
@@ -293,7 +293,7 @@ export default function Navbar({
             <button
               type="button"
               onClick={() => setMobileOpen(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 text-zinc-500 hover:bg-zinc-100"
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-zinc-200 text-zinc-500 hover:bg-zinc-100"
             >
               <X size={16} />
             </button>
@@ -317,7 +317,7 @@ export default function Navbar({
                     mobileSection === "location" ? null : "location",
                   )
                 }
-                className="flex w-full items-center justify-between px-4 py-3"
+                className="flex w-full cursor-pointer items-center justify-between px-4 py-3"
               >
                 <div className="text-left">
                   <p className="text-xs font-bold text-zinc-900">Lokasi</p>
@@ -368,7 +368,7 @@ export default function Navbar({
                 onClick={() =>
                   setMobileSection(mobileSection === "date" ? null : "date")
                 }
-                className="flex w-full items-center justify-between px-4 py-3"
+                className="flex w-full cursor-pointer items-center justify-between px-4 py-3"
               >
                 <div className="text-left">
                   <p className="text-xs font-bold text-zinc-900">Tanggal</p>
@@ -411,7 +411,7 @@ export default function Navbar({
                 onClick={() =>
                   setMobileSection(mobileSection === "guests" ? null : "guests")
                 }
-                className="flex w-full items-center justify-between px-4 py-3"
+                className="flex w-full cursor-pointer items-center justify-between px-4 py-3"
               >
                 <div className="text-left">
                   <p className="text-xs font-bold text-zinc-900">Tamu</p>
@@ -445,7 +445,7 @@ export default function Navbar({
                           type="button"
                           onClick={() => updateMobileGuest(row.key, -1)}
                           disabled={mobileGuests[row.key] <= row.min}
-                          className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-300 text-zinc-700 hover:border-zinc-500 disabled:opacity-30"
+                          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-zinc-300 text-zinc-700 hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                           <Minus size={14} />
                         </button>
@@ -459,7 +459,7 @@ export default function Navbar({
                             row.key !== "baby" &&
                             mobileGuests.adult + mobileGuests.child >= 10
                           }
-                          className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-300 text-zinc-700 hover:border-zinc-500 disabled:opacity-30"
+                          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-zinc-300 text-zinc-700 hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                           <Plus size={14} />
                         </button>
@@ -476,14 +476,14 @@ export default function Navbar({
             <button
               type="button"
               onClick={clearMobileSearch}
-              className="text-sm font-medium text-zinc-700 underline underline-offset-2"
+              className="cursor-pointer text-sm font-medium text-zinc-700 underline underline-offset-2"
             >
               Hapus semua
             </button>
             <button
               type="button"
               onClick={handleMobileSearch}
-              className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary/90"
+              className="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary/90"
             >
               <Search size={16} />
               Cari
@@ -515,7 +515,7 @@ export default function Navbar({
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="flex flex-1 items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2.5 shadow-sm active:scale-[0.98] transition-transform"
+              className="flex flex-1 cursor-pointer items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2.5 shadow-sm active:scale-[0.98] transition-transform"
             >
               <Search size={15} className="shrink-0 text-zinc-400" />
               <span className="text-sm text-zinc-400">Mulai pencarian</span>
@@ -595,7 +595,7 @@ export default function Navbar({
                       <Link
                         href="/profile"
                         onClick={() => setShowProfileMenu(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50"
+                        className="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50"
                       >
                         <UserCircle size={15} className="text-zinc-400" />
                         Profil saya
@@ -603,7 +603,7 @@ export default function Navbar({
                       <Link
                         href="/booking"
                         onClick={() => setShowProfileMenu(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50"
+                        className="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50"
                       >
                         <Navigation size={15} className="text-zinc-400" />
                         Perjalanan
@@ -624,7 +624,7 @@ export default function Navbar({
                 <button
                   type="button"
                   onClick={() => setAuthOpen(true)}
-                  className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-800 hover:shadow-md transition"
+                  className="cursor-pointer rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-800 hover:shadow-md transition"
                 >
                   Masuk / Daftar
                 </button>
@@ -642,7 +642,7 @@ export default function Navbar({
                   key={cat.key}
                   type="button"
                   onClick={() => router.push(cat.href)}
-                  className="relative flex flex-col items-center gap-1 py-3 transition hover:opacity-80 group"
+                  className="relative flex cursor-pointer flex-col items-center gap-1 py-3 transition hover:opacity-80 group"
                 >
                   {cat.isNew && (
                     <span className="absolute -top-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-zinc-800 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
@@ -654,7 +654,7 @@ export default function Navbar({
                       "text-sm font-medium transition",
                       activeCategory === cat.key
                         ? "text-zinc-900"
-                        : "text-zinc-500 group-hover:text-zinc-700",
+                        : "text-zinc-500 group-hover:text-primary",
                     )}
                   >
                     {cat.label}

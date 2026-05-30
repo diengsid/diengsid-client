@@ -50,7 +50,6 @@ export default function BookProperty({
   const [quantity, setQuantity] = useState(1);
   const [firstPayment, setFirstPayment] = useState<"FULL" | "DP">("FULL");
   const [phoneOverride, setPhoneOverride] = useState<string | null>(null);
-  const [errorMsg, setErrorMsg] = useState("");
 
   const { data: currentUser } = useCurrentUser(!!token);
   const phoneNumber = phoneOverride ?? currentUser?.phone_number ?? "";
@@ -92,7 +91,6 @@ export default function BookProperty({
       return;
     }
     if (!localDateRange.start || !localDateRange.end || !rentable) return;
-    setErrorMsg("");
 
     mutate(
       {
@@ -110,13 +108,6 @@ export default function BookProperty({
           router.push(
             `/booking/konfirmasi/${res.data.id}?property_id=${propertyId}`,
           ),
-        onError: (err: unknown) => {
-          setErrorMsg(
-            err instanceof Error
-              ? err.message
-              : "Terjadi kesalahan, coba lagi.",
-          );
-        },
       },
     );
   };
@@ -395,11 +386,6 @@ export default function BookProperty({
               </p>
             </div>
 
-            {errorMsg && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
-                {errorMsg}
-              </div>
-            )}
           </div>
 
           {/* ── RIGHT COLUMN (desktop) ───────────────────────────────────────── */}
