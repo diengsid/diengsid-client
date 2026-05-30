@@ -134,6 +134,12 @@ export default async function WisataDetailPage({ params }: Props) {
   const nearbyProperties = await fetchNearbyProperties(a.id);
   const colorCls = CATEGORY_COLOR[a.category ?? ""] ?? "bg-zinc-100 text-zinc-600";
 
+  // Same category first, shuffle the rest, max 6
+  const recommendations = [
+    ...attractions.filter((x) => x.id !== a.id && x.category === a.category),
+    ...attractions.filter((x) => x.id !== a.id && x.category !== a.category),
+  ].slice(0, 6);
+
   return (
     <>
       <JsonLd
@@ -218,7 +224,7 @@ export default async function WisataDetailPage({ params }: Props) {
               <section>
                 <h2 className="mb-3 text-lg font-semibold text-zinc-900">Tentang</h2>
                 <div
-                  className="prose prose-sm max-w-none text-zinc-600"
+                  className="prose prose-sm prose-zinc max-w-none prose-headings:text-zinc-900 prose-a:text-primary-700 prose-strong:text-zinc-800"
                   dangerouslySetInnerHTML={{ __html: a.description }}
                 />
               </section>
@@ -278,6 +284,61 @@ export default async function WisataDetailPage({ params }: Props) {
           </div>
         </div>
       </main>
+
+      {/* Rekomendasi wisata lainnya */}
+      {recommendations.length > 0 && (
+        <section className="border-t border-zinc-100 bg-zinc-50 py-10">
+          <div className="container mx-auto max-w-4xl px-4">
+            <h2 className="mb-6 text-lg font-semibold text-zinc-900">
+              Wisata Lainnya
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {recommendations.map((r) => {
+                const rc = CATEGORY_COLOR[r.category ?? ""] ?? "bg-zinc-100 text-zinc-600";
+                return (
+                  <Link
+                    key={r.id}
+                    href={`/wisata/${r.slug}`}
+                    className="group flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="relative h-36 w-full overflow-hidden bg-zinc-100">
+                      {r.image_url ? (
+                        <Image
+                          fill
+                          src={r.image_url}
+                          alt={r.name}
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <MapPin size={28} className="text-zinc-300" />
+                        </div>
+                      )}
+                      {r.category && (
+                        <span className={cn("absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-medium", rc)}>
+                          {CATEGORY_LABEL[r.category] ?? r.category}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1 p-3">
+                      <p className="font-semibold text-zinc-900 line-clamp-1 group-hover:text-primary-700 transition-colors text-sm">
+                        {r.name}
+                      </p>
+                      {r.address && (
+                        <p className="flex items-center gap-1 text-xs text-zinc-400 line-clamp-1">
+                          <MapPin size={10} className="shrink-0" />
+                          {r.address}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       <Footer />
       <div className="md:hidden">

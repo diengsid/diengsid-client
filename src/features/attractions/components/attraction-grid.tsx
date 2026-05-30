@@ -87,10 +87,9 @@ function AttractionCard({ a }: { a: Attraction }) {
           </p>
         )}
         {a.description && (
-          <p
-            className="mt-1 text-sm text-zinc-500 line-clamp-2"
-            dangerouslySetInnerHTML={{ __html: a.description }}
-          />
+          <p className="mt-1 text-sm text-zinc-500 line-clamp-2">
+            {a.description.replace(/<[^>]*>/g, "")}
+          </p>
         )}
       </div>
     </Link>

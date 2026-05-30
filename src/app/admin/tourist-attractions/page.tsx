@@ -95,7 +95,7 @@ function CreateModal({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: { preventDefault(): void }) => {
     e.preventDefault();
     if (!form.name.trim() || !form.slug.trim()) {
       toast.error("Nama dan slug wajib diisi");
@@ -273,8 +273,8 @@ function AttractionCard({ a }: { a: AttractionResponse }) {
         </div>
         {a.description && (
           <p
-            className="mt-1.5 text-xs text-zinc-500 line-clamp-2 prose-sm"
-            dangerouslySetInnerHTML={{ __html: a.description }}
+            className="mt-1.5 text-xs text-zinc-500 line-clamp-2"
+            dangerouslySetInnerHTML={{ __html: a.description?.replace(/<[^>]*>/g, "") ?? "" }}
           />
         )}
       </div>
