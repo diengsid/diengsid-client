@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { Footer } from "@/components/shared/footer/footer";
 import Navbar from "@/components/shared/navbar/navbar";
 import BookingConfirmation from "@/features/book/components/booking-confirmation";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Detail Booking",
+  robots: { index: false, follow: false },
+};
 
 type Props = {
   params: Promise<{ id: string }>;

@@ -11,6 +11,12 @@ const staticPages: MetadataRoute.Sitemap = [
     priority: 1.0,
   },
   {
+    url: `${SITE_URL}/wisata`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.9,
+  },
+  {
     url: `${SITE_URL}/layanan`,
     lastModified: new Date(),
     changeFrequency: "monthly",
@@ -26,28 +32,43 @@ const staticPages: MetadataRoute.Sitemap = [
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let propertyPages: MetadataRoute.Sitemap = [];
+  let attractionPages: MetadataRoute.Sitemap = [];
 
-  try {
-    // Use native fetch (not axios) — localStorage is unavailable server-side
-    const res = await fetch(`${API_URL}/api/properties?page=1&size=500`, {
+  await Promise.all([
+    // Properties
+    fetch(`${API_URL}/api/properties?page=1&size=500`, {
       next: { revalidate: 3600 },
-    });
+    })
+      .then((res) => res.ok ? res.json() : null)
+      .then((json) => {
+        const items: Array<{ id: string; updated_at: number }> =
+          json?.data ?? [];
+        propertyPages = items.map((p) => ({
+          url: `${SITE_URL}/penginapan/${p.id}`,
+          lastModified: new Date(p.updated_at * 1000),
+          changeFrequency: "weekly" as const,
+          priority: 0.8,
+        }));
+      })
+      .catch(() => {}),
 
-    if (res.ok) {
-      const json = await res.json();
-      const properties: Array<{ id: string; updated_at: number }> =
-        json.data ?? [];
+    // Tourist attractions
+    fetch(`${API_URL}/api/tourist-attractions`, {
+      next: { revalidate: 3600 },
+    })
+      .then((res) => res.ok ? res.json() : null)
+      .then((json) => {
+        const items: Array<{ slug: string; updated_at: number }> =
+          json?.data ?? [];
+        attractionPages = items.map((a) => ({
+          url: `${SITE_URL}/wisata/${a.slug}`,
+          lastModified: new Date(a.updated_at * 1000),
+          changeFrequency: "weekly" as const,
+          priority: 0.7,
+        }));
+      })
+      .catch(() => {}),
+  ]);
 
-      propertyPages = properties.map((p) => ({
-        url: `${SITE_URL}/penginapan/${p.id}`,
-        lastModified: new Date(p.updated_at * 1000),
-        changeFrequency: "weekly" as const,
-        priority: 0.8,
-      }));
-    }
-  } catch {
-    // API unavailable at build time — static pages still get indexed
-  }
-
-  return [...staticPages, ...propertyPages];
+  return [...staticPages, ...propertyPages, ...attractionPages];
 }

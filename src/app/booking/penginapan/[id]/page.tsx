@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import BookProperty from "@/features/book/components/book-property";
 import { parseLocalDate } from "@/lib/date";
 import { cookies } from "next/headers";
+
+export const metadata: Metadata = {
+  title: "Pesan Penginapan",
+  robots: { index: false, follow: false },
+};
 
 type Props = {
   params: Promise<{

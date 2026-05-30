@@ -5,13 +5,14 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/layanan", "/pengalaman", "/penginapan/", "/search/homes"],
+        allow: ["/", "/wisata/", "/wisata", "/layanan", "/pengalaman", "/penginapan/", "/search/homes"],
         disallow: [
           "/admin/",
           "/sign-in/",
           "/profile/",
           "/booking/",
           "/pembayaran/",
+          "/payment/",
         ],
       },
     ],
