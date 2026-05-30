@@ -34,7 +34,8 @@ export async function serverFetch<T>(
     if (!res.ok) return null;
     const json = await res.json();
     return (json.data ?? json) as T;
-  } catch {
+  } catch (err) {
+    console.error(`[serverFetch] ${path}`, err instanceof Error ? err.message : err);
     return null;
   }
 }
