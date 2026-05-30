@@ -5,6 +5,7 @@ import { Footer } from "@/components/shared/footer/footer";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";
 import Navbar from "@/components/shared/navbar/navbar";
 import { JsonLd } from "@/components/shared/json-ld";
+import { serverFetch } from "@/lib/server-fetch";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -12,8 +13,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MapPin, ChevronRight, Clock, Ruler } from "lucide-react";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const CATEGORY_LABEL: Record<string, string> = {
   alam: "Alam",
@@ -36,30 +35,15 @@ const CATEGORY_COLOR: Record<string, string> = {
 // ── Server fetch helpers ──────────────────────────────────────────────────────
 
 async function fetchAttractions(): Promise<Attraction[]> {
-  try {
-    const res = await fetch(`${API_URL}/api/tourist-attractions`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.data ?? [];
-  } catch {
-    return [];
-  }
+  return (await serverFetch<Attraction[]>("/tourist-attractions")) ?? [];
 }
 
 async function fetchNearbyProperties(attractionId: string): Promise<Property[]> {
-  try {
-    const res = await fetch(
-      `${API_URL}/api/properties?attraction_id=${attractionId}&page=1&size=6`,
-      { next: { revalidate: 3600 } },
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.data ?? [];
-  } catch {
-    return [];
-  }
+  return (
+    (await serverFetch<Property[]>(
+      `/properties?attraction_id=${attractionId}&page=1&size=6`,
+    )) ?? []
+  );
 }
 
 // ── Metadata ─────────────────────────────────────────────────────────────────

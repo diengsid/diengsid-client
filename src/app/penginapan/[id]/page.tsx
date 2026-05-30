@@ -4,7 +4,7 @@ import Navbar from "@/components/shared/navbar/navbar";
 import DetailProperty from "@/features/properties/components/detail";
 import NavItem from "@/features/properties/components/nav-detail";
 import NavbarDetailProperty from "@/features/properties/components/navbar";
-import { detailProperty } from "@/features/properties/services/property-service";
+import { serverDetailProperty } from "@/features/properties/services/property-server-service";
 import { parseLocalDate } from "@/lib/date";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -23,7 +23,9 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const { id } = await params;
-    const { data: property } = await detailProperty(id);
+    const result = await serverDetailProperty(id);
+    if (!result) throw new Error("not found");
+    const { data: property } = result;
     const description =
       property.description?.slice(0, 160) ||
       `${property.title} — penginapan di kawasan Dieng Wonosobo. Pesan sekarang di Diengs.id.`;
@@ -59,7 +61,7 @@ export default async function DetailPropertyPage({
   const token = cookieStore.get("token");
 
   // fetch for JSON-LD — Next.js deduplicates identical requests within the same render
-  const propertyData = await detailProperty(id).catch(() => null);
+  const propertyData = await serverDetailProperty(id).catch(() => null);
   const property = propertyData?.data;
 
   const minPrice = property?.rentable?.length

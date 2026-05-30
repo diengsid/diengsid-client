@@ -1,5 +1,5 @@
 import { AttractionGrid } from "@/features/attractions/components/attraction-grid";
-import { getAttractions } from "@/features/attractions/services/attraction-service";
+import { serverGetAttractions } from "@/features/attractions/services/attraction-server-service";
 import { Footer } from "@/components/shared/footer/footer";
 import MenuBar from "@/components/shared/menu-bar/menu-bar";
 import Navbar from "@/components/shared/navbar/navbar";
@@ -41,7 +41,7 @@ export default async function WisataPage() {
 
   await queryClient.prefetchQuery({
     queryKey: ["attractions"],
-    queryFn: getAttractions,
+    queryFn: serverGetAttractions,
   });
 
   const dehydratedState = dehydrate(queryClient);

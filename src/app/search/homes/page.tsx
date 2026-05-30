@@ -3,7 +3,7 @@ import MenuBar from "@/components/shared/menu-bar/menu-bar";
 import Navbar from "@/components/shared/navbar/navbar";
 import SearchPageContent from "@/features/properties/components/search-page-content";
 import { SearchPropertyRequest } from "@/features/properties/schemas/schema-property";
-import { getProperties } from "@/features/properties/services/property-service";
+import { serverGetProperties } from "@/features/properties/services/property-server-service";
 import {
   dehydrate,
   HydrationBoundary,
@@ -57,7 +57,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
   await queryClient.prefetchQuery({
     queryKey: ["properties", search],
-    queryFn: () => getProperties(search),
+    queryFn: () => serverGetProperties(search),
   });
 
   const dehydratedState = dehydrate(queryClient);
