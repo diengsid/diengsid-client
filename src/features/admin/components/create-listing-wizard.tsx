@@ -3,11 +3,11 @@
 import {
   createProperty,
   createRentable,
-  PropertyImageInput,
   getAmenities,
   getHosts,
   HostCreateRequest,
   HostResponse,
+  PropertyImageInput,
   uploadImages,
 } from "@/features/admin/services/admin-service";
 import { cn } from "@/lib/utils";
@@ -26,23 +26,38 @@ import {
   Users,
   X,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { AmenityIcon } from "./amenity-icon";
 import { ImageUploader, UploadedImage } from "./image-uploader";
-import dynamic from "next/dynamic";
 
 const MapPicker = dynamic(
   () => import("@/components/shared/map-picker/MapPicker"),
-  { ssr: false, loading: () => <div className="h-[280px] w-full rounded-xl bg-zinc-100 animate-pulse" /> },
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[280px] w-full rounded-xl bg-zinc-100 animate-pulse" />
+    ),
+  },
 );
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
-const PROPERTY_TYPES = ["homestay", "villa", "cottage", "glamping", "hotel"];
+const PROPERTY_TYPES = [
+  "homestay",
+  "hotel",
+  "villa",
+  "guesthouse",
+  "apartment",
+  "cabin",
+  "villa",
+  "cottage",
+  "glamping",
+];
 const BOOKING_TYPES = ["room", "unit"];
-const RENTABLE_TYPES = ["room", "cottage", "villa", "tent"];
+const RENTABLE_TYPES = ["room", "unit"];
 
 const inputCls =
   "w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-primary-700 focus:ring-1 focus:ring-primary-700/20";
@@ -398,7 +413,8 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
               lat: prop.lat ?? undefined,
               lng: prop.lng ?? undefined,
               images: imageInputs.length > 0 ? imageInputs : undefined,
-              amenity_ids: prop.amenity_ids.length > 0 ? prop.amenity_ids : undefined,
+              amenity_ids:
+                prop.amenity_ids.length > 0 ? prop.amenity_ids : undefined,
             }
           : {
               host: prop.host,
@@ -411,7 +427,8 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
               lat: prop.lat ?? undefined,
               lng: prop.lng ?? undefined,
               images: imageInputs.length > 0 ? imageInputs : undefined,
-              amenity_ids: prop.amenity_ids.length > 0 ? prop.amenity_ids : undefined,
+              amenity_ids:
+                prop.amenity_ids.length > 0 ? prop.amenity_ids : undefined,
             };
 
       const propRes = await createProperty(propPayload);
@@ -532,7 +549,11 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                     Lokasi <span className="text-red-500">*</span>
                   </label>
                   <MapPicker
-                    value={prop.lat !== null && prop.lng !== null ? { lat: prop.lat, lng: prop.lng } : null}
+                    value={
+                      prop.lat !== null && prop.lng !== null
+                        ? { lat: prop.lat, lng: prop.lng }
+                        : null
+                    }
                     onChange={handleMapPick}
                     loading={geocoding}
                   />
@@ -542,7 +563,9 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                   <label className={labelCls}>Alamat</label>
                   <input
                     value={prop.address}
-                    onChange={(e) => setProp((s) => ({ ...s, address: e.target.value }))}
+                    onChange={(e) =>
+                      setProp((s) => ({ ...s, address: e.target.value }))
+                    }
                     className={inputCls}
                     placeholder="Pilih lokasi di peta, atau ketik manual"
                   />
@@ -618,7 +641,9 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                     <div className="max-h-52 overflow-y-auto rounded-lg border border-zinc-200 divide-y divide-zinc-100">
                       {hosts.length === 0 ? (
                         <p className="px-4 py-6 text-center text-xs text-zinc-400">
-                          {hostSearch ? "Host tidak ditemukan" : "Belum ada host"}
+                          {hostSearch
+                            ? "Host tidak ditemukan"
+                            : "Belum ada host"}
                         </p>
                       ) : (
                         hosts.map((h: HostResponse) => {
@@ -633,7 +658,9 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                             <button
                               key={h.id}
                               type="button"
-                              onClick={() => setProp((s) => ({ ...s, host_id: h.id }))}
+                              onClick={() =>
+                                setProp((s) => ({ ...s, host_id: h.id }))
+                              }
                               className={cn(
                                 "flex w-full items-center gap-3 px-3 py-2.5 text-left transition",
                                 selected
@@ -641,17 +668,30 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                                   : "hover:bg-zinc-50",
                               )}
                             >
-                              <div className={cn(
-                                "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
-                                selected ? "bg-primary-700 text-white" : "bg-zinc-100 text-zinc-600",
-                              )}>
+                              <div
+                                className={cn(
+                                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
+                                  selected
+                                    ? "bg-primary-700 text-white"
+                                    : "bg-zinc-100 text-zinc-600",
+                                )}
+                              >
                                 {initials}
                               </div>
                               <div className="min-w-0">
-                                <p className="text-sm font-medium text-zinc-800 truncate">{h.name}</p>
-                                <p className="text-xs text-zinc-400 truncate">{h.email}</p>
+                                <p className="text-sm font-medium text-zinc-800 truncate">
+                                  {h.name}
+                                </p>
+                                <p className="text-xs text-zinc-400 truncate">
+                                  {h.email}
+                                </p>
                               </div>
-                              {selected && <Check size={14} className="ml-auto shrink-0 text-primary-700" />}
+                              {selected && (
+                                <Check
+                                  size={14}
+                                  className="ml-auto shrink-0 text-primary-700"
+                                />
+                              )}
                             </button>
                           );
                         })
@@ -971,7 +1011,11 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
               type="button"
               onClick={() => {
                 if (!canAdvanceStep1) {
-                  if (!prop.title.trim() || !prop.description.trim() || (!prop.address.trim() && prop.lat === null)) {
+                  if (
+                    !prop.title.trim() ||
+                    !prop.description.trim() ||
+                    (!prop.address.trim() && prop.lat === null)
+                  ) {
                     toast.error("Lengkapi judul, alamat, dan deskripsi");
                   } else {
                     toast.error(
