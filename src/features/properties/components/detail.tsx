@@ -307,8 +307,10 @@ export default function DetailProperty({
 
           {/* DESCRIPTION */}
           <section className="mt-6 border-b pb-6">
-            <p className="font-light">{property?.description}</p>
-            <Button variant="link">Tampilkan lebih banyak</Button>
+            <div
+              className="prose prose-sm prose-zinc max-w-none prose-headings:text-zinc-900 prose-a:text-primary-700 prose-strong:text-zinc-800 font-light"
+              dangerouslySetInnerHTML={{ __html: property?.description ?? "" }}
+            />
           </section>
 
           {/* FACILITIES */}

@@ -82,7 +82,9 @@ export default function SearchPropertyCard({
       <div className="flex flex-1 flex-col py-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-xs text-zinc-400 capitalize">{property.property_type}</p>
+            <p className="text-xs text-zinc-400 capitalize">
+              {property.property_type}
+            </p>
             <h3 className="font-semibold text-zinc-900 truncate leading-snug mt-0.5">
               {property.title}
             </h3>
@@ -97,11 +99,11 @@ export default function SearchPropertyCard({
           {property.address}
         </p>
 
-        {property.description && (
+        {/* {property.description && (
           <p className="hidden md:block mt-1 text-xs text-zinc-400 line-clamp-1">
             {property.description}
           </p>
-        )}
+        )} */}
 
         <div className="mt-auto pt-2">
           {minPrice != null ? (

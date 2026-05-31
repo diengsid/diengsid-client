@@ -32,6 +32,7 @@ import { useCallback, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { AmenityIcon } from "./amenity-icon";
 import { ImageUploader, UploadedImage } from "./image-uploader";
+import { RichTextEditor } from "./rich-text-editor";
 
 const MapPicker = dynamic(
   () => import("@/components/shared/map-picker/MapPicker"),
@@ -575,14 +576,12 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                   <label className={labelCls}>
                     Deskripsi <span className="text-red-500">*</span>
                   </label>
-                  <textarea
-                    rows={3}
+                  <RichTextEditor
                     value={prop.description}
-                    onChange={(e) =>
-                      setProp((s) => ({ ...s, description: e.target.value }))
+                    onChange={(html) =>
+                      setProp((s) => ({ ...s, description: html }))
                     }
-                    className={cn(inputCls, "resize-none")}
-                    placeholder="Deskripsi properti"
+                    placeholder="Deskripsi properti..."
                   />
                 </div>
               </div>

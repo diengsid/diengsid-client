@@ -1,5 +1,5 @@
 import Button from "@/components/ui/button/button";
-import { Bath, BedDouble, Check, Users, Wifi } from "lucide-react";
+import { Check, Users } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { Rentable } from "../../schemas/schema-property";
@@ -41,7 +41,7 @@ export default function RentableCard({
         {/* TITLE */}
         <div>
           <h2 className="text-lg font-semibold">{rentable.name}</h2>
-          <p className="text-sm text-gray-500">Nyaman & modern</p>
+          {/* <p className="text-sm text-gray-500">Nyaman & modern</p> */}
         </div>
 
         {/* FACILITIES */}
@@ -50,7 +50,7 @@ export default function RentableCard({
             <Users size={16} />
             {rentable.capacity} tamu
           </div>
-          <div className="flex items-center gap-1">
+          {/* <div className="flex items-center gap-1">
             <BedDouble size={16} />
             {rentable.stock} kasur
           </div>
@@ -61,7 +61,7 @@ export default function RentableCard({
           <div className="flex items-center gap-1">
             <Wifi size={16} />
             Wifi
-          </div>
+          </div> */}
         </div>
 
         {/* PRICE + ACTION */}

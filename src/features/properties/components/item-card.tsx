@@ -20,9 +20,17 @@ export default function PropertyItemCard({ property }: Props): React.ReactNode {
     property.images?.[0]?.image_url ||
     PLACEHOLDER;
 
-  const minPrice = property.rentable?.length
-    ? Math.min(...property.rentable.map((r) => r.base_price))
+  const cheapestRentable = property.rentable?.length
+    ? property.rentable.reduce((prev, curr) => {
+        const prevFinal = prev.base_price * (1 - (prev.discount ?? 0) / 100);
+        const currFinal = curr.base_price * (1 - (curr.discount ?? 0) / 100);
+        return currFinal < prevFinal ? curr : prev;
+      })
     : null;
+
+  const basePrice = cheapestRentable?.base_price ?? null;
+  const discount = cheapestRentable?.discount ?? 0;
+  const finalPrice = basePrice != null ? basePrice * (1 - discount / 100) : null;
 
   const handleClick = () => {
     const url =
@@ -78,16 +86,28 @@ export default function PropertyItemCard({ property }: Props): React.ReactNode {
         </div>
       </div>
 
-      <div className="flex items-center gap-1 text-sm">
-        {minPrice != null ? (
+      <div className="flex flex-col gap-0.5 text-sm">
+        {finalPrice != null ? (
           <>
-            <span className="font-semibold text-gray-900">
-              Rp {minPrice.toLocaleString("id-ID")}
-            </span>
-            <span className="text-gray-500 text-xs">/ malam</span>
+            {discount > 0 && (
+              <div className="flex items-center gap-1.5">
+                <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-semibold text-emerald-700">
+                  -{discount}%
+                </span>
+                <span className="text-xs text-gray-400 line-through">
+                  Rp {basePrice!.toLocaleString("id-ID")}
+                </span>
+              </div>
+            )}
+            <div className="flex items-center gap-1">
+              <span className="font-semibold text-gray-900">
+                Rp {finalPrice.toLocaleString("id-ID")}
+              </span>
+              <span className="text-xs text-gray-500">/ malam</span>
+            </div>
           </>
         ) : (
-          <span className="text-gray-400 text-xs">Harga belum tersedia</span>
+          <span className="text-xs text-gray-400">Harga belum tersedia</span>
         )}
       </div>
     </div>
