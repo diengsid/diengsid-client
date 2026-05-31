@@ -12,8 +12,10 @@ import {
   Building,
   Building2,
   Home,
+  House,
+  Tent,
   TreePine,
-  Users,
+  Warehouse,
   type LucideIcon,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -28,12 +30,14 @@ type Category = {
 };
 
 const categories: Category[] = [
-  { label: "Hotel", value: "hotel", icon: Building2 },
-  { label: "Guesthouse", value: "guesthouse", icon: Home },
-  { label: "Hostel", value: "hostel", icon: Users },
-  { label: "Villa", value: "villa", icon: TreePine },
-  { label: "Cabin", value: "cabin", icon: BedDouble },
-  { label: "Apartemen", value: "apartemen", icon: Building },
+  { label: "Homestay", value: "homestay", icon: Home },
+  { label: "Hotel",    value: "hotel",    icon: Building2 },
+  { label: "Villa",    value: "villa",    icon: TreePine },
+  { label: "Guesthouse", value: "guesthouse", icon: House },
+  { label: "Apartment", value: "apartment", icon: Building },
+  { label: "Cabin",    value: "cabin",    icon: BedDouble },
+  { label: "Cottage",  value: "cottage",  icon: Warehouse },
+  { label: "Glamping", value: "glamping", icon: Tent },
 ];
 
 export default function Categories(): React.ReactNode {
