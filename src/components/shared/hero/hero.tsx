@@ -76,7 +76,7 @@ export function Hero() {
             </div>
 
             {/* popular searches */}
-            <div className="mt-7">
+            <div className="mt-7 hidden">
               <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-zinc-400">
                 Populer di Dieng
               </p>
@@ -94,7 +94,7 @@ export function Hero() {
           </div>
 
           {/* ── Right: stats ── */}
-          <div className="grid grid-cols-2 gap-4 lg:w-72 lg:shrink-0">
+          <div className="md:grid grid-cols-2 gap-4 lg:w-72 lg:shrink-0 hidden">
             {stats.map(({ icon: Icon, value, label }) => (
               <div
                 key={label}
