@@ -13,7 +13,7 @@ export function Logo({ scrollY }: { scrollY: number }) {
         height={40}
         priority
         className={`transition-all duration-300 origin-left ${
-          isSmall ? "scale-80" : "scale-100"
+          isSmall ? "scale-80" : "scale-85"
         }`}
       />
     </Link>

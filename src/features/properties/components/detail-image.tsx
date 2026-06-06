@@ -53,7 +53,7 @@ function Lightbox({
 
   if (mode === "grid") {
     return (
-      <div className="fixed inset-0 z-[1000] flex flex-col bg-white">
+      <div className="fixed inset-0 z-9999 flex flex-col bg-white">
         {/* header */}
         <div className="flex items-center justify-between px-4 py-3 shrink-0 border-b border-black/10">
           <span className="text-sm font-semibold text-black">
@@ -93,7 +93,7 @@ function Lightbox({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white">
+    <div className="fixed inset-0 z-9999 flex flex-col bg-white">
       {/* header */}
       <div className="flex items-center justify-between px-4 py-3 shrink-0">
         <button

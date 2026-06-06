@@ -34,7 +34,7 @@ export function WhyChooseUs() {
         {/* Header */}
         <div className="mb-16 max-w-2xl">
           <h2 className="text-3xl font-semibold text-gray-900 md:text-4xl">
-            Mengapa dieng.id?
+            Mengapa diengs.id?
           </h2>
           <p className="mt-4 text-gray-500">
             Kami memberikan pengalaman liburan terbaik di Dieng dengan pelayanan
