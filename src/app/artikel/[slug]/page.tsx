@@ -2,6 +2,7 @@ import { createImageUrlBuilder, type SanityImageSource } from "@sanity/image-url
 import type { Metadata } from "next";
 import { PortableText, type SanityDocument } from "next-sanity";
 import { cookies } from "next/headers";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { client } from "../../../../sanity/client";
@@ -78,11 +79,12 @@ function RelatedCard({ post }: { post: SanityDocument }) {
     >
       <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
         {imgUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={imgUrl}
             alt={post.title}
-            className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
+            fill
+            unoptimized
+            className="object-cover transition duration-300 group-hover:scale-105"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-emerald-50 text-lg">
@@ -127,11 +129,13 @@ export default async function PostPage({
       {/* ── Hero image ── */}
       {heroUrl ? (
         <div className="relative h-[50vh] min-h-72 w-full overflow-hidden bg-zinc-900 pt-16">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={heroUrl}
             alt={post.title}
-            className="absolute inset-0 h-full w-full object-cover opacity-80"
+            fill
+            priority
+            unoptimized
+            className="object-cover opacity-80"
           />
           <div className="absolute inset-0 bg-linear-to-t from-zinc-900/80 via-zinc-900/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-4xl px-6 pb-8 lg:px-8">

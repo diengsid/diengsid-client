@@ -8,6 +8,7 @@ import { Calendar, ChevronRight, Clock } from "lucide-react";
 import type { Metadata } from "next";
 import type { SanityDocument } from "next-sanity";
 import { cookies } from "next/headers";
+import Image from "next/image";
 import Link from "next/link";
 import { client } from "../../../sanity/client";
 
@@ -50,7 +51,7 @@ function formatDate(dateStr: string) {
   });
 }
 
-// ── Hero post (large, left) ───────────────────────────────────────────────────
+// ── Hero post (large, featured) ───────────────────────────────────────────────
 
 function HeroCard({ post }: { post: SanityDocument }) {
   const imgUrl = post.image ? urlFor(post.image) : null;
@@ -58,14 +59,16 @@ function HeroCard({ post }: { post: SanityDocument }) {
   return (
     <Link
       href={`/artikel/${post.slug.current}`}
-      className="group relative flex h-full min-h-72 flex-col justify-end overflow-hidden rounded-2xl bg-zinc-900"
+      className="group relative flex h-72 flex-col justify-end overflow-hidden rounded-2xl bg-zinc-900 md:h-96"
     >
       {imgUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           src={imgUrl}
           alt={post.title}
-          className="absolute inset-0 h-full w-full object-cover opacity-75 transition duration-500 group-hover:scale-105 group-hover:opacity-65"
+          fill
+          priority
+          unoptimized
+          className="object-cover opacity-75 transition duration-500 group-hover:scale-105 group-hover:opacity-65"
         />
       ) : (
         <div className="absolute inset-0 bg-linear-to-br from-emerald-700 to-teal-900" />
@@ -73,17 +76,17 @@ function HeroCard({ post }: { post: SanityDocument }) {
       {/* gradient overlay */}
       <div className="absolute inset-0 bg-linear-to-t from-zinc-900/90 via-zinc-900/30 to-transparent" />
 
-      <div className="relative z-10 flex flex-col gap-2.5 p-5 md:p-6">
+      <div className="relative z-10 flex flex-col gap-2.5 p-5 md:p-8">
         {post.categories?.[0] && (
           <span className="w-fit rounded-full bg-emerald-500/90 px-2.5 py-0.5 text-xs font-semibold text-white backdrop-blur-sm">
             {post.categories[0]}
           </span>
         )}
-        <h2 className="text-lg font-bold leading-snug text-white transition group-hover:text-emerald-200 md:text-xl">
+        <h2 className="text-xl font-bold leading-snug text-white transition group-hover:text-emerald-200 md:text-2xl">
           {post.title}
         </h2>
         {post.excerpt && (
-          <p className="line-clamp-2 text-xs leading-relaxed text-white/70">
+          <p className="line-clamp-2 text-sm leading-relaxed text-white/70">
             {post.excerpt}
           </p>
         )}
@@ -104,62 +107,6 @@ function HeroCard({ post }: { post: SanityDocument }) {
   );
 }
 
-// ── Side post (compact, stacked right) ───────────────────────────────────────
-
-function SideCard({ post }: { post: SanityDocument }) {
-  const imgUrl = post.image ? urlFor(post.image) : null;
-
-  return (
-    <Link
-      href={`/artikel/${post.slug.current}`}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-zinc-100 transition hover:shadow-md"
-    >
-      <div className="relative aspect-video shrink-0 overflow-hidden bg-zinc-100">
-        {imgUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imgUrl}
-            alt={post.title}
-            className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-emerald-50 to-teal-100 text-2xl">
-            🏔️
-          </div>
-        )}
-        {post.categories?.[0] && (
-          <span className="absolute left-2.5 top-2.5 rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white shadow">
-            {post.categories[0]}
-          </span>
-        )}
-      </div>
-      <div className="flex flex-1 flex-col gap-1.5 p-4">
-        <div className="flex items-center gap-2 text-xs text-zinc-400">
-          <Calendar size={11} />
-          {formatDate(post.publishedAt)}
-          {post.estimatedReadingTime > 0 && (
-            <>
-              <span>·</span>
-              <Clock size={11} />
-              {post.estimatedReadingTime} mnt
-            </>
-          )}
-        </div>
-        <h3 className="line-clamp-2 font-bold leading-snug text-zinc-900 transition group-hover:text-emerald-700">
-          {post.title}
-        </h3>
-        <div className="mt-auto flex items-center gap-1 pt-1 text-xs font-semibold text-emerald-700">
-          Baca selengkapnya
-          <ChevronRight
-            size={12}
-            className="transition group-hover:translate-x-0.5"
-          />
-        </div>
-      </div>
-    </Link>
-  );
-}
-
 // ── Regular article card ──────────────────────────────────────────────────────
 
 function ArticleCard({ post }: { post: SanityDocument }) {
@@ -173,11 +120,12 @@ function ArticleCard({ post }: { post: SanityDocument }) {
       {/* image */}
       <div className="relative aspect-video overflow-hidden bg-zinc-100">
         {imgUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={imgUrl}
             alt={post.title}
-            className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            fill
+            unoptimized
+            className="object-cover transition duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-emerald-50 to-teal-100">
@@ -235,7 +183,7 @@ export default async function ArtikelPage() {
   const token = cookieStore.get("token");
   const posts = await client.fetch<SanityDocument[]>(POSTS_QUERY, {}, options);
 
-  const [featured, second, third] = posts;
+  const [featured] = posts;
   const rest = posts.slice(1);
 
   return (
@@ -274,7 +222,7 @@ export default async function ArtikelPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-12">
-            {/* Editorial featured: hero kiri + 2 kartu kanan */}
+            {/* Artikel terbaru — hanya satu post paling baru */}
             {featured && (
               <section>
                 <div className="mb-5 flex items-center gap-3">
@@ -283,24 +231,7 @@ export default async function ArtikelPage() {
                     Artikel Terbaru
                   </span>
                 </div>
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-5 md:grid-rows-2 md:h-120">
-                  {/* hero — ambil 3 kolom */}
-                  <div className="md:col-span-3 md:row-span-2">
-                    <HeroCard post={featured} />
-                  </div>
-                  {/* side atas */}
-                  {second && (
-                    <div className="md:col-span-2 md:row-span-1">
-                      <SideCard post={second} />
-                    </div>
-                  )}
-                  {/* side bawah */}
-                  {third && (
-                    <div className="md:col-span-2 md:row-span-1">
-                      <SideCard post={third} />
-                    </div>
-                  )}
-                </div>
+                <HeroCard post={featured} />
               </section>
             )}
 

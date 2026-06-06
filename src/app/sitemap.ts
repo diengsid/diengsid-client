@@ -1,5 +1,6 @@
 import { SERVER_API_URL } from "@/lib/server-fetch";
 import type { MetadataRoute } from "next";
+import { client } from "../../sanity/client";
 
 const SITE_URL = "https://diengs.id";
 
@@ -18,15 +19,41 @@ const NOW = new Date().toISOString();
 const staticPages: MetadataRoute.Sitemap = [
   { url: SITE_URL,                 lastModified: NOW, changeFrequency: "daily",   priority: 1.0 },
   { url: `${SITE_URL}/wisata`,     lastModified: NOW, changeFrequency: "weekly",  priority: 0.9 },
-  { url: `${SITE_URL}/layanan`,    lastModified: NOW, changeFrequency: "monthly", priority: 0.5 },
-  { url: `${SITE_URL}/pengalaman`, lastModified: NOW, changeFrequency: "monthly", priority: 0.5 },
+  { url: `${SITE_URL}/artikel`,      lastModified: NOW, changeFrequency: "weekly",  priority: 0.8 },
+  { url: `${SITE_URL}/tentang-kami`, lastModified: NOW, changeFrequency: "monthly", priority: 0.6 },
+  { url: `${SITE_URL}/layanan`,      lastModified: NOW, changeFrequency: "monthly", priority: 0.5 },
+  { url: `${SITE_URL}/pengalaman`,   lastModified: NOW, changeFrequency: "monthly", priority: 0.5 },
 ];
+
+const POSTS_SITEMAP_QUERY = `*[_type == "post" && defined(slug.current)]{
+  "slug": slug.current,
+  publishedAt
+}`;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let propertyPages: MetadataRoute.Sitemap = [];
   let attractionPages: MetadataRoute.Sitemap = [];
+  let articlePages: MetadataRoute.Sitemap = [];
 
   await Promise.all([
+    // Sanity articles
+    client
+      .fetch<Array<{ slug: string; publishedAt: string }>>(
+        POSTS_SITEMAP_QUERY,
+        {},
+        { next: { revalidate: 3600 } },
+      )
+      .then((posts) => {
+        articlePages = posts.map((p) => ({
+          url: `${SITE_URL}/artikel/${p.slug}`,
+          lastModified: p.publishedAt ? new Date(p.publishedAt).toISOString() : NOW,
+          changeFrequency: "weekly" as const,
+          priority: 0.7,
+        }));
+      })
+      .catch(() => {}),
+
+
     // Properties — uses SERVER_API_URL (internal Docker) to bypass Cloudflare
     fetch(`${SERVER_API_URL}/api/properties?page=1&size=500`, {
       next: { revalidate: 3600 },
@@ -62,5 +89,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .catch(() => {}),
   ]);
 
-  return [...staticPages, ...propertyPages, ...attractionPages];
+  return [...staticPages, ...propertyPages, ...attractionPages, ...articlePages];
 }
