@@ -99,6 +99,7 @@ function LinkPopover({ onSubmit, onClose, initialUrl = "" }: LinkPopoverProps) {
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (url.trim()) onSubmit(url.trim());
     else onClose();
   };
@@ -150,6 +151,7 @@ function ImagePopover({ onSubmit, onClose }: ImagePopoverProps) {
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (src.trim()) onSubmit(src.trim(), alt.trim());
     else onClose();
   };
