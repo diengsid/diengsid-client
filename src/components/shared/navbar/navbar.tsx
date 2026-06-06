@@ -535,6 +535,7 @@ export default function Navbar({
                   <SearchBar
                     onSearch={() => {}}
                     defaultLocation={searchParams.get("q") ?? ""}
+                    defaultAttractionId={searchParams.get("attraction_id") ?? ""}
                     defaultCheckIn={rawCheckIn ? parseISO(rawCheckIn) : null}
                     defaultCheckOut={rawCheckOut ? parseISO(rawCheckOut) : null}
                     defaultGuests={{
@@ -675,6 +676,7 @@ export default function Navbar({
               <SearchBar
                 onSearch={() => setSearchOpen(false)}
                 defaultLocation={searchParams.get("q") ?? ""}
+                defaultAttractionId={searchParams.get("attraction_id") ?? ""}
                 defaultCheckIn={rawCheckIn ? parseISO(rawCheckIn) : null}
                 defaultCheckOut={rawCheckOut ? parseISO(rawCheckOut) : null}
                 defaultGuests={{

@@ -1,15 +1,14 @@
-import { JsonLd } from "@/components/shared/json-ld";
 import { Footer } from "@/components/shared/footer/footer";
+import { JsonLd } from "@/components/shared/json-ld";
 import Navbar from "@/components/shared/navbar/navbar";
-
-export const dynamic = "force-dynamic";
 import DetailProperty from "@/features/properties/components/detail";
-import NavItem from "@/features/properties/components/nav-detail";
 import NavbarDetailProperty from "@/features/properties/components/navbar";
 import { serverDetailProperty } from "@/features/properties/services/property-server-service";
 import { parseLocalDate } from "@/lib/date";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+
+export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{
@@ -144,8 +143,6 @@ export default async function DetailPropertyPage({
       <div className="hidden md:block">
         <Navbar isFixed={false} token={token?.value} />
       </div>
-
-      <NavItem totalDays={3} />
 
       {/* detail section */}
       <DetailProperty

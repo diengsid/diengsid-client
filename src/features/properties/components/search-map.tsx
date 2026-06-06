@@ -66,49 +66,99 @@ function PropertyPopupCard({ property }: { property: Property }) {
     ? Math.min(...property.rentable.map((r) => r.base_price))
     : null;
 
-  const href = `/properties/${property.id}`;
+  const href = `/penginapan/${property.id}`;
 
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      style={{ display: "block", textDecoration: "none", color: "inherit", width: 220 }}
+      style={{
+        display: "block",
+        textDecoration: "none",
+        color: "inherit",
+        width: 220,
+      }}
     >
       {/* image */}
-      <div style={{ position: "relative", width: "100%", height: 130, overflow: "hidden", background: "#e5e7eb" }}>
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          height: 130,
+          overflow: "hidden",
+          background: "#e5e7eb",
+        }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={thumbnail}
           alt={property.title}
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-          onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER; }}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = PLACEHOLDER;
+          }}
         />
-        <span style={{
-          position: "absolute",
-          top: 8,
-          left: 8,
-          background: "rgba(0,0,0,0.45)",
-          color: "#fff",
-          fontSize: 10,
-          fontWeight: 600,
-          padding: "2px 8px",
-          borderRadius: 999,
-          textTransform: "capitalize",
-        }}>
+        <span
+          style={{
+            position: "absolute",
+            top: 8,
+            left: 8,
+            background: "rgba(0,0,0,0.45)",
+            color: "#fff",
+            fontSize: 10,
+            fontWeight: 600,
+            padding: "2px 8px",
+            borderRadius: 999,
+            textTransform: "capitalize",
+          }}
+        >
           {property.property_type}
         </span>
       </div>
 
       {/* content */}
       <div style={{ padding: "10px 12px 12px" }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: "#18181b", margin: 0, lineHeight: 1.3, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+        <p
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            color: "#18181b",
+            margin: 0,
+            lineHeight: 1.3,
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+          }}
+        >
           {property.title}
         </p>
-        <p style={{ fontSize: 11, color: "#71717a", margin: "3px 0 0", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
+        <p
+          style={{
+            fontSize: 11,
+            color: "#71717a",
+            margin: "3px 0 0",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+          }}
+        >
           {property.address}
         </p>
-        <div style={{ marginTop: 8, display: "flex", alignItems: "baseline", gap: 4 }}>
+        <div
+          style={{
+            marginTop: 8,
+            display: "flex",
+            alignItems: "baseline",
+            gap: 4,
+          }}
+        >
           {minPrice != null ? (
             <>
               <span style={{ fontSize: 13, fontWeight: 700, color: "#18181b" }}>
@@ -117,7 +167,9 @@ function PropertyPopupCard({ property }: { property: Property }) {
               <span style={{ fontSize: 11, color: "#a1a1aa" }}>/ malam</span>
             </>
           ) : (
-            <span style={{ fontSize: 11, color: "#a1a1aa" }}>Harga belum tersedia</span>
+            <span style={{ fontSize: 11, color: "#a1a1aa" }}>
+              Harga belum tersedia
+            </span>
           )}
         </div>
       </div>
@@ -160,7 +212,11 @@ export default function SearchMap({ properties, hoveredId }: Props) {
 
           return (
             <Marker key={p.id} position={[p.lat!, p.lng!]} icon={icon}>
-              <Popup className="property-card-popup" closeButton autoPan={false}>
+              <Popup
+                className="property-card-popup"
+                closeButton
+                autoPan={false}
+              >
                 <PropertyPopupCard property={p} />
               </Popup>
             </Marker>

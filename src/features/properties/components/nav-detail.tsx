@@ -11,7 +11,7 @@ export default function NavItem({ totalDays }: Props) {
   const { scrollY } = useScroll();
   return (
     <div
-      className={`${scrollY > 360 ? "sticky" : "hidden"} w-full z-[90] border-b top-0 bg-white py-5`}
+      className={`${scrollY > 360 ? "sticky" : "hidden"} w-full z-[90] border-b top-0 bg-white py-5 absolute`}
     >
       <div className="flex gap-x-2 container mx-auto px-3 md:px-20">
         <Button variant="link" onClick={() => scrollToId("photos")}>

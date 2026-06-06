@@ -38,6 +38,7 @@ import { useFindProperty } from "../hooks/useFindProperty";
 import type { Amenity } from "../schemas/schema-property";
 
 import DetailImageProperty from "./detail-image";
+import NavItem from "./nav-detail";
 import { PropertyRecommendations } from "./property-recommendations";
 import { PropertyReviews } from "./property-reviews";
 import RoomList from "./rooms/list";
@@ -254,389 +255,401 @@ export default function DetailProperty({
 
   // ── UI ────────────────────────────────────────────────────────────────────
   return (
-    <div className="mx-auto max-w-6xl w-full">
-      {/* ── Gallery ── */}
-      <section id="photos">
-        <DetailImageProperty images={property?.images} />
-      </section>
+    <>
+      <NavItem totalDays={totalDays} />
 
-      <div className="flex gap-12 mt-8">
-        {/* ════ LEFT CONTENT ════════════════════════════════════════════════ */}
-        <div className="min-w-0 flex-1 px-4 pb-32 md:px-0">
-          {/* Title + address */}
-          <div>
-            <h1 className="text-2xl font-bold capitalize text-zinc-900 md:text-3xl">
-              {property?.title}
-            </h1>
-            <div className="mt-2 flex items-center gap-1.5 text-sm text-zinc-500">
-              <MapPin size={14} className="shrink-0 text-emerald-500" />
-              {property?.address}
-            </div>
+      <div className="mx-auto max-w-6xl w-full">
+        {/* ── Gallery ── */}
+        <section id="photos">
+          <DetailImageProperty images={property?.images} />
+        </section>
 
-            {/* Quick badges */}
-            <div className="mt-3 flex flex-wrap gap-2">
-              {property?.property_type && (
-                <span className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium capitalize text-zinc-600">
-                  {property.property_type}
-                </span>
-              )}
-              <span className="flex items-center gap-1 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                <ShieldCheck size={11} />
-                Terverifikasi
-              </span>
-              {rating > 0 && (
-                <span className="flex items-center gap-1 rounded-full border border-amber-100 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
-                  <Star size={11} />
-                  {rating} · Host Pilihan
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* ── Divider ── */}
-          <hr className="my-6 border-zinc-100" />
-
-          {/* Host */}
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full ring-2 ring-emerald-100">
-              <Image
-                width={48}
-                height={48}
-                src={property?.host?.profile_picture_url || "/host_avatar.png"}
-                alt={property?.host?.name ?? "host"}
-                className="h-full w-full object-cover"
-              />
-            </div>
+        <div className="flex gap-12 mt-8">
+          {/* ════ LEFT CONTENT ════════════════════════════════════════════════ */}
+          <div className="min-w-0 flex-1 px-4 pb-32 md:px-0">
+            {/* Title + address */}
             <div>
-              <p className="font-semibold text-zinc-900">
-                Tuan rumah: {property?.host?.name}
-              </p>
-              <p className="text-sm text-zinc-400">
-                Host teladan · berpengalaman
-              </p>
+              <h1 className="text-2xl font-bold capitalize text-zinc-900 md:text-3xl">
+                {property?.title}
+              </h1>
+              <div className="mt-2 flex items-center gap-1.5 text-sm text-zinc-500">
+                <MapPin size={14} className="shrink-0 text-emerald-500" />
+                {property?.address}
+              </div>
+
+              {/* Quick badges */}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {property?.property_type && (
+                  <span className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium capitalize text-zinc-600">
+                    {property.property_type}
+                  </span>
+                )}
+                <span className="flex items-center gap-1 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+                  <ShieldCheck size={11} />
+                  Terverifikasi
+                </span>
+                {rating > 0 && (
+                  <span className="flex items-center gap-1 rounded-full border border-amber-100 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+                    <Star size={11} />
+                    {rating} · Host Pilihan
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* ── Divider ── */}
-          <hr className="my-6 border-zinc-100" />
+            {/* ── Divider ── */}
+            <hr className="my-6 border-zinc-100" />
 
-          {/* Description */}
-          <section id="description">
-            <div
-              className="prose prose-sm prose-zinc max-w-none font-light
+            {/* Host */}
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full ring-2 ring-emerald-100">
+                <Image
+                  width={48}
+                  height={48}
+                  src={
+                    property?.host?.profile_picture_url || "/host_avatar.png"
+                  }
+                  alt={property?.host?.name ?? "host"}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div>
+                <p className="font-semibold text-zinc-900">
+                  Tuan rumah: {property?.host?.name}
+                </p>
+                <p className="text-sm text-zinc-400">
+                  Host teladan · berpengalaman
+                </p>
+              </div>
+            </div>
+
+            {/* ── Divider ── */}
+            <hr className="my-6 border-zinc-100" />
+
+            {/* Description */}
+            <section id="description">
+              <div
+                className="prose prose-sm prose-zinc max-w-none font-light
                 prose-headings:font-semibold prose-headings:text-zinc-900
                 prose-p:text-zinc-600 prose-p:leading-relaxed
                 prose-a:text-emerald-700 prose-strong:text-zinc-800"
-              dangerouslySetInnerHTML={{ __html: property?.description ?? "" }}
-            />
-          </section>
+                dangerouslySetInnerHTML={{
+                  __html: property?.description ?? "",
+                }}
+              />
+            </section>
 
-          {/* ── Amenities ── */}
-          {amenityGroups.length > 0 && (
-            <>
-              <hr className="my-8 border-zinc-100" />
-              <section id="amenities">
-                <h2 className="text-xl font-bold text-zinc-900">Fasilitas</h2>
-                <div className="mt-5 space-y-6">
-                  {amenityGroups.map(([category, items]) => (
-                    <div key={category}>
-                      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                        {category}
-                      </p>
-                      <div className="grid grid-cols-2 gap-y-3 gap-x-4 sm:grid-cols-3">
-                        {items.map((amenity) => (
-                          <div
-                            key={amenity.id}
-                            className="flex items-center gap-2.5"
-                          >
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-600">
-                              <AmenityIcon
-                                icon={amenity.icon ?? ""}
-                                size={17}
-                              />
+            {/* ── Amenities ── */}
+            {amenityGroups.length > 0 && (
+              <>
+                <hr className="my-8 border-zinc-100" />
+                <section id="amenities">
+                  <h2 className="text-xl font-bold text-zinc-900">Fasilitas</h2>
+                  <div className="mt-5 space-y-6">
+                    {amenityGroups.map(([category, items]) => (
+                      <div key={category}>
+                        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                          {category}
+                        </p>
+                        <div className="grid grid-cols-2 gap-y-3 gap-x-4 sm:grid-cols-3">
+                          {items.map((amenity) => (
+                            <div
+                              key={amenity.id}
+                              className="flex items-center gap-2.5"
+                            >
+                              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-600">
+                                <AmenityIcon
+                                  icon={amenity.icon ?? ""}
+                                  size={17}
+                                />
+                              </div>
+                              <span className="text-sm text-zinc-700">
+                                {amenity.name}
+                              </span>
                             </div>
-                            <span className="text-sm text-zinc-700">
-                              {amenity.name}
-                            </span>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </>
-          )}
+                    ))}
+                  </div>
+                </section>
+              </>
+            )}
 
-          {/* ── Rooms ── */}
-          <hr className="my-8 border-zinc-100" />
-          <section id="rooms">
-            <h2 className="text-xl font-bold text-zinc-900">Pilih Kamar</h2>
-            <p className="mt-1 text-sm text-zinc-400">{property?.title}</p>
-            <div className="mt-5">
-              <RoomList
-                selectRentableId={rentableID}
-                rentables={property?.rentable ?? []}
-              />
-            </div>
-          </section>
+            {/* ── Rooms ── */}
+            <hr className="my-8 border-zinc-100" />
+            <section id="rooms">
+              <h2 className="text-xl font-bold text-zinc-900">
+                {property?.property_type == "room"
+                  ? "Pilih Kamar"
+                  : "Detail Properti"}
+              </h2>
+              <p className="mt-1 text-sm text-zinc-400">{property?.title}</p>
+              <div className="mt-5">
+                <RoomList
+                  selectRentableId={rentableID}
+                  rentables={property?.rentable ?? []}
+                />
+              </div>
+            </section>
 
-          {/* ── Calendar ── */}
-          <hr className="my-8 border-zinc-100" />
-          <section className="relative z-0" id="calendars">
-            {renderCalendarHeader()}
-            <div className="mt-4">
-              <DateRangePicker
-                value={dateRange}
-                onChange={handleDateChange}
-                disabledDates={disabledDates}
-              />
-            </div>
-          </section>
+            {/* ── Calendar ── */}
+            <hr className="my-8 border-zinc-100" />
+            <section className="relative z-0" id="calendars">
+              {renderCalendarHeader()}
+              <div className="mt-4">
+                <DateRangePicker
+                  value={dateRange}
+                  onChange={handleDateChange}
+                  disabledDates={disabledDates}
+                />
+              </div>
+            </section>
 
-          {/* ── Map ── */}
-          <hr className="my-8 border-zinc-100" />
-          <section id="locations">
-            <h2 className="text-xl font-bold text-zinc-900">Lokasi</h2>
-            <p className="mt-1 mb-4 flex items-center gap-1.5 text-sm text-zinc-500">
-              <MapPin size={14} className="text-emerald-500" />
-              {property?.address}
-            </p>
-            <div className="overflow-hidden rounded-2xl">
-              <MapViewer
-                center={[property?.lat ?? -7.205, property?.lng ?? 109.906]}
-                zoom={14}
-                markers={[
-                  {
-                    id: "1",
-                    position: [
-                      property?.lat ?? -7.205,
-                      property?.lng ?? 109.906,
-                    ],
-                    label: property?.title,
-                  },
-                ]}
-              />
-            </div>
-          </section>
+            {/* ── Map ── */}
+            <hr className="my-8 border-zinc-100" />
+            <section id="locations">
+              <h2 className="text-xl font-bold text-zinc-900">Lokasi</h2>
+              <p className="mt-1 mb-4 flex items-center gap-1.5 text-sm text-zinc-500">
+                <MapPin size={14} className="text-emerald-500" />
+                {property?.address}
+              </p>
+              <div className="overflow-hidden rounded-2xl">
+                <MapViewer
+                  center={[property?.lat ?? -7.205, property?.lng ?? 109.906]}
+                  zoom={14}
+                  markers={[
+                    {
+                      id: "1",
+                      position: [
+                        property?.lat ?? -7.205,
+                        property?.lng ?? 109.906,
+                      ],
+                      label: property?.title,
+                    },
+                  ]}
+                />
+              </div>
+            </section>
 
-          {/* ── Nearby Attractions ── */}
-          {nearbyAttractions.length > 0 && (
-            <>
-              <hr className="my-8 border-zinc-100" />
-              <section>
-                <h2 className="text-xl font-bold text-zinc-900">
-                  Wisata Terdekat
-                </h2>
-                <p className="mt-1 text-sm text-zinc-400">
-                  Destinasi populer di sekitar penginapan ini
-                </p>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {nearbyAttractions.map(
-                    ({ attraction: a, distance_km, duration_minutes }) => (
-                      <Link
-                        key={a.id}
-                        href={`/wisata/${a.slug}`}
-                        className="group flex gap-3 rounded-xl border border-zinc-100 bg-white p-3 transition hover:border-emerald-200 hover:shadow-md"
-                      >
-                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
-                          {a.image_url ? (
-                            <Image
-                              fill
-                              src={a.image_url}
-                              alt={a.name}
-                              className="object-cover transition-transform duration-300 group-hover:scale-105"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center">
-                              <MapPin size={20} className="text-zinc-300" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="line-clamp-1 text-sm font-semibold text-zinc-900 transition group-hover:text-emerald-700">
-                            {a.name}
-                          </p>
-                          {a.category && (
-                            <span className="mt-0.5 inline-block rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] capitalize text-zinc-500">
-                              {a.category}
-                            </span>
-                          )}
-                          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
-                            {distance_km != null && (
-                              <span className="flex items-center gap-1 text-xs text-zinc-400">
-                                <Ruler size={11} />
-                                {distance_km} km
-                              </span>
-                            )}
-                            {duration_minutes != null && (
-                              <span className="flex items-center gap-1 text-xs text-zinc-400">
-                                <Clock size={11} />
-                                {duration_minutes} menit
-                              </span>
+            {/* ── Nearby Attractions ── */}
+            {nearbyAttractions.length > 0 && (
+              <>
+                <hr className="my-8 border-zinc-100" />
+                <section>
+                  <h2 className="text-xl font-bold text-zinc-900">
+                    Wisata Terdekat
+                  </h2>
+                  <p className="mt-1 text-sm text-zinc-400">
+                    Destinasi populer di sekitar penginapan ini
+                  </p>
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {nearbyAttractions.map(
+                      ({ attraction: a, distance_km, duration_minutes }) => (
+                        <Link
+                          key={a.id}
+                          href={`/wisata/${a.slug}`}
+                          className="group flex gap-3 rounded-xl border border-zinc-100 bg-white p-3 transition hover:border-emerald-200 hover:shadow-md"
+                        >
+                          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+                            {a.image_url ? (
+                              <Image
+                                fill
+                                src={a.image_url}
+                                alt={a.name}
+                                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                unoptimized
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center">
+                                <MapPin size={20} className="text-zinc-300" />
+                              </div>
                             )}
                           </div>
-                        </div>
-                      </Link>
-                    ),
-                  )}
-                </div>
-              </section>
-            </>
-          )}
-          {/* ── Reviews ── */}
-          <hr className="my-8 border-zinc-100" />
-          <PropertyReviews propertyTitle={property?.title} />
+                          <div className="min-w-0 flex-1">
+                            <p className="line-clamp-1 text-sm font-semibold text-zinc-900 transition group-hover:text-emerald-700">
+                              {a.name}
+                            </p>
+                            {a.category && (
+                              <span className="mt-0.5 inline-block rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] capitalize text-zinc-500">
+                                {a.category}
+                              </span>
+                            )}
+                            <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+                              {distance_km != null && (
+                                <span className="flex items-center gap-1 text-xs text-zinc-400">
+                                  <Ruler size={11} />
+                                  {distance_km} km
+                                </span>
+                              )}
+                              {duration_minutes != null && (
+                                <span className="flex items-center gap-1 text-xs text-zinc-400">
+                                  <Clock size={11} />
+                                  {duration_minutes} menit
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      ),
+                    )}
+                  </div>
+                </section>
+              </>
+            )}
+            {/* ── Reviews ── */}
+            <hr className="my-8 border-zinc-100" />
+            <PropertyReviews propertyTitle={property?.title} />
 
-          {/* ── Recommendations ── */}
-          <hr className="my-8 border-zinc-100" />
-          <PropertyRecommendations
-            currentId={propertyId}
-            propertyType={property?.property_type}
-          />
+            {/* ── Recommendations ── */}
+            <hr className="my-8 border-zinc-100" />
+            <PropertyRecommendations
+              currentId={propertyId}
+              propertyType={property?.property_type}
+            />
+          </div>
+
+          {/* ════ RIGHT BOOKING SIDEBAR ════════════════════════════════════ */}
+          <div className="hidden md:block shrink-0">
+            <div className="sticky top-24 w-88">
+              <div className="rounded-2xl border border-zinc-200 bg-white shadow-lg p-6 space-y-5">
+                {/* Price */}
+                <div
+                  className="cursor-pointer rounded-xl bg-zinc-50 p-4 transition hover:bg-zinc-100"
+                  onClick={() => setModalBook(true)}
+                >
+                  {renderPrice()}
+                </div>
+
+                {/* Date */}
+                <InputDateRange value={dateRange} onChange={handleDateChange} />
+
+                {/* Guests */}
+                <GuestSelector />
+
+                {/* Room selector */}
+                <div className="flex items-center justify-between rounded-xl border border-zinc-200 px-4 py-3">
+                  <div className="flex items-center gap-2 text-sm text-zinc-700">
+                    <DoorClosed size={16} className="text-zinc-400" />
+                    <span>{rentable ? rentable.name : "Pilih kamar"}</span>
+                  </div>
+                  <button
+                    onClick={() => scrollToId("rooms")}
+                    className="flex cursor-pointer items-center gap-1 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-xs font-medium text-zinc-600 transition hover:bg-zinc-200"
+                  >
+                    <PenLine size={13} />
+                    Ubah
+                  </button>
+                </div>
+
+                {/* CTA */}
+                <Button
+                  className="w-full rounded-xl!"
+                  disabled={isLoadingPrice || totalDays === 0}
+                  onClick={handlePesan}
+                >
+                  Pesan Sekarang
+                </Button>
+
+                <p className="text-center text-xs text-zinc-400">
+                  Belum ada biaya yang dikenakan sekarang
+                </p>
+              </div>
+
+              {/* Trust badges */}
+              <div className="mt-4 flex flex-col gap-2 text-xs text-zinc-400">
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck size={13} className="text-emerald-500" />
+                  Pembayaran aman &amp; terenkripsi
+                </span>
+                {rating > 0 && (
+                  <span className="flex items-center gap-1.5">
+                    <Star size={13} className="text-amber-400" />
+                    Host Pilihan · Rating {rating}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* ════ RIGHT BOOKING SIDEBAR ════════════════════════════════════ */}
-        <div className="hidden md:block shrink-0">
-          <div className="sticky top-24 w-88">
-            <div className="rounded-2xl border border-zinc-200 bg-white shadow-lg p-6 space-y-5">
-              {/* Price */}
-              <div
-                className="cursor-pointer rounded-xl bg-zinc-50 p-4 transition hover:bg-zinc-100"
-                onClick={() => setModalBook(true)}
-              >
-                {renderPrice()}
-              </div>
-
-              {/* Date */}
-              <InputDateRange value={dateRange} onChange={handleDateChange} />
-
-              {/* Guests */}
-              <GuestSelector />
-
-              {/* Room selector */}
-              <div className="flex items-center justify-between rounded-xl border border-zinc-200 px-4 py-3">
-                <div className="flex items-center gap-2 text-sm text-zinc-700">
-                  <DoorClosed size={16} className="text-zinc-400" />
-                  <span>{rentable ? rentable.name : "Pilih kamar"}</span>
-                </div>
-                <button
-                  onClick={() => scrollToId("rooms")}
-                  className="flex cursor-pointer items-center gap-1 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-xs font-medium text-zinc-600 transition hover:bg-zinc-200"
-                >
-                  <PenLine size={13} />
-                  Ubah
-                </button>
-              </div>
-
-              {/* CTA */}
-              <Button
-                className="w-full rounded-xl!"
-                disabled={isLoadingPrice || totalDays === 0}
-                onClick={handlePesan}
-              >
-                Pesan Sekarang
-              </Button>
-
-              <p className="text-center text-xs text-zinc-400">
-                Belum ada biaya yang dikenakan sekarang
-              </p>
-            </div>
-
-            {/* Trust badges */}
-            <div className="mt-4 flex flex-col gap-2 text-xs text-zinc-400">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck size={13} className="text-emerald-500" />
-                Pembayaran aman &amp; terenkripsi
+        {/* ════ MOBILE BOTTOM BAR ════════════════════════════════════════════ */}
+        <div className="fixed cursor-pointer bottom-0 left-0 right-0 z-50 border-t border-zinc-100 bg-white px-4 py-3 shadow-lg md:hidden">
+          <div
+            className="mb-2 flex items-center gap-1 text-sm"
+            onClick={() => scrollToId("rooms")}
+          >
+            <DoorClosed size={14} className="text-zinc-400" />
+            <span className="font-medium text-zinc-700 underline">
+              {rentable ? rentable.name : "Pilih kamar"}
+            </span>
+            {checkIn && checkOut && totalDays > 0 && (
+              <span className="text-zinc-400">
+                · {format(checkIn, "dd MMM", { locale: id })} –{" "}
+                {format(checkOut, "dd MMM", { locale: id })}
               </span>
-              {rating > 0 && (
-                <span className="flex items-center gap-1.5">
-                  <Star size={13} className="text-amber-400" />
-                  Host Pilihan · Rating {rating}
-                </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <div
+              className="flex-1 cursor-pointer"
+              onClick={() => setModalBook(true)}
+            >
+              {renderPrice(true)}
+            </div>
+            <Button
+              className="rounded-xl! px-6"
+              disabled={isLoadingPrice || totalDays === 0}
+              onClick={handlePesan}
+            >
+              Pesan
+            </Button>
+          </div>
+        </div>
+
+        {/* ════ PRICE BREAKDOWN MODAL ════════════════════════════════════════ */}
+        <Modal isOpen={modalBook} onClose={() => setModalBook(false)}>
+          <div className="space-y-5">
+            <div>
+              <h3 className="text-lg font-bold text-zinc-900">Rincian Harga</h3>
+              {rentable && (
+                <p className="mt-0.5 text-sm text-zinc-400">{rentable.name}</p>
               )}
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* ════ MOBILE BOTTOM BAR ════════════════════════════════════════════ */}
-      <div className="fixed cursor-pointer bottom-0 left-0 right-0 z-50 border-t border-zinc-100 bg-white px-4 py-3 shadow-lg md:hidden">
-        <div
-          className="mb-2 flex items-center gap-1 text-sm"
-          onClick={() => scrollToId("rooms")}
-        >
-          <DoorClosed size={14} className="text-zinc-400" />
-          <span className="font-medium text-zinc-700 underline">
-            {rentable ? rentable.name : "Pilih kamar"}
-          </span>
-          {checkIn && checkOut && totalDays > 0 && (
-            <span className="text-zinc-400">
-              · {format(checkIn, "dd MMM", { locale: id })} –{" "}
-              {format(checkOut, "dd MMM", { locale: id })}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          <div
-            className="flex-1 cursor-pointer"
-            onClick={() => setModalBook(true)}
-          >
-            {renderPrice(true)}
-          </div>
-          <Button
-            className="rounded-xl! px-6"
-            disabled={isLoadingPrice || totalDays === 0}
-            onClick={handlePesan}
-          >
-            Pesan
-          </Button>
-        </div>
-      </div>
-
-      {/* ════ PRICE BREAKDOWN MODAL ════════════════════════════════════════ */}
-      <Modal isOpen={modalBook} onClose={() => setModalBook(false)}>
-        <div className="space-y-5">
-          <div>
-            <h3 className="text-lg font-bold text-zinc-900">Rincian Harga</h3>
-            {rentable && (
-              <p className="mt-0.5 text-sm text-zinc-400">{rentable.name}</p>
-            )}
-          </div>
-
-          <div className="rounded-xl bg-zinc-50 p-4 space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-zinc-600">
-                {totalDays} malam × Rp{" "}
-                {rentable?.base_price.toLocaleString("id-ID")}
-              </span>
-              <span className="font-medium">
-                Rp {totalPrice.toLocaleString("id-ID")}
-              </span>
-            </div>
-            {hasDiscount && (
-              <div className="flex justify-between text-emerald-600">
-                <span>Diskon {discountPercent}%</span>
-                <span>− Rp {totalDiscount.toLocaleString("id-ID")}</span>
+            <div className="rounded-xl bg-zinc-50 p-4 space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-zinc-600">
+                  {totalDays} malam × Rp{" "}
+                  {rentable?.base_price.toLocaleString("id-ID")}
+                </span>
+                <span className="font-medium">
+                  Rp {totalPrice.toLocaleString("id-ID")}
+                </span>
               </div>
-            )}
-            <hr className="border-zinc-200" />
-            <div className="flex justify-between font-bold text-zinc-900">
-              <span>Total</span>
-              <span>Rp {finalPrice.toLocaleString("id-ID")}</span>
+              {hasDiscount && (
+                <div className="flex justify-between text-emerald-600">
+                  <span>Diskon {discountPercent}%</span>
+                  <span>− Rp {totalDiscount.toLocaleString("id-ID")}</span>
+                </div>
+              )}
+              <hr className="border-zinc-200" />
+              <div className="flex justify-between font-bold text-zinc-900">
+                <span>Total</span>
+                <span>Rp {finalPrice.toLocaleString("id-ID")}</span>
+              </div>
             </div>
-          </div>
 
-          <Button
-            className="w-full rounded-xl! md:hidden"
-            disabled={isLoadingPrice || totalDays === 0}
-            onClick={handlePesan}
-          >
-            Pesan Sekarang
-          </Button>
-        </div>
-      </Modal>
-    </div>
+            <Button
+              className="w-full rounded-xl! md:hidden"
+              disabled={isLoadingPrice || totalDays === 0}
+              onClick={handlePesan}
+            >
+              Pesan Sekarang
+            </Button>
+          </div>
+        </Modal>
+      </div>
+    </>
   );
 }

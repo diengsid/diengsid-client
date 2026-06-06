@@ -1,14 +1,17 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import DateRangePicker, {
   DateRange,
 } from "@/components/shared/date-range-picker/date-range-picker";
+import { getAttractions } from "@/features/attractions/services/attraction-service";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { MapPin, Minus, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 // ─── guest types ──────────────────────────────────────────────────────────────
 
@@ -20,14 +23,11 @@ const GUEST_ROWS = [
   { key: "baby" as const, label: "Bayi", sub: "Di bawah 2 tahun", min: 0 },
 ];
 
-// ─── quick location suggestions ───────────────────────────────────────────────
-
-const SUGGESTIONS = ["Dieng", "Wonosobo", "Sikunir", "Telaga Warna", "Batur"];
-
 // ─── props ────────────────────────────────────────────────────────────────────
 
 type Props = {
   defaultLocation?: string;
+  defaultAttractionId?: string;
   defaultCheckIn?: Date | null;
   defaultCheckOut?: Date | null;
   defaultGuests?: Guests;
@@ -39,6 +39,7 @@ type Props = {
 
 export default function SearchBar({
   defaultLocation = "",
+  defaultAttractionId = "",
   defaultCheckIn = null,
   defaultCheckOut = null,
   defaultGuests,
@@ -52,6 +53,9 @@ export default function SearchBar({
     null,
   );
   const [location, setLocation] = useState(defaultLocation);
+  const [attractionId, setAttractionId] = useState<string | null>(
+    defaultAttractionId || null,
+  );
   const [dateRange, setDateRange] = useState<DateRange>({
     start: defaultCheckIn,
     end: defaultCheckOut,
@@ -59,6 +63,31 @@ export default function SearchBar({
   const [guests, setGuests] = useState<Guests>(
     defaultGuests ?? { adult: 1, child: 0, baby: 0 },
   );
+
+  // fetch attractions for location suggestions
+  const { data: attractionsData } = useQuery({
+    queryKey: ["attractions"],
+    queryFn: getAttractions,
+    staleTime: 10 * 60 * 1000,
+  });
+  const attractions = useMemo(() => attractionsData?.data ?? [], [attractionsData]);
+
+  const resolvedRef = useRef(false);
+  useEffect(() => {
+    if (resolvedRef.current || !defaultAttractionId || !attractions.length) return;
+    const found = attractions.find((a) => a.id === defaultAttractionId);
+    if (found) {
+      setLocation(found.name);
+      resolvedRef.current = true;
+    }
+  }, [attractions, defaultAttractionId]);
+
+  // filter suggestions based on typed input
+  const filtered = location.trim()
+    ? attractions.filter((a) =>
+        a.name.toLowerCase().includes(location.toLowerCase()),
+      )
+    : attractions;
 
   // close on outside click
   useEffect(() => {
@@ -103,7 +132,11 @@ export default function SearchBar({
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (location.trim()) params.set("q", location.trim());
+    if (attractionId) {
+      params.set("attraction_id", attractionId);
+    } else if (location.trim()) {
+      params.set("q", location.trim());
+    }
     if (dateRange.start)
       params.set("check_in", format(dateRange.start, "yyyy-MM-dd"));
     if (dateRange.end)
@@ -151,7 +184,7 @@ export default function SearchBar({
     <div ref={ref} className="relative w-full">
       {/* ── pill ── */}
       <div className="flex items-center rounded-full bg-white p-2 shadow-custom">
-        {section("location", "Lokasi", location || null, "Cari destinasi")}
+        {section("location", "Lokasi", location || null, "Ke mana saja")}
         <div className="h-8 w-px shrink-0 bg-zinc-200" />
         {section("date", "Kapan", dateLabel, "Tambahkan tanggal")}
         <div className="h-8 w-px shrink-0 bg-zinc-200" />
@@ -166,7 +199,6 @@ export default function SearchBar({
           )}
         >
           <Search size={compact ? 16 : 18} />
-          {/* {!compact && <span className="hidden md:inline">Cari</span>} */}
         </button>
       </div>
 
@@ -181,25 +213,34 @@ export default function SearchBar({
             <input
               autoFocus
               value={location}
-              onChange={(e) => setLocation(e.target.value)}
+              onChange={(e) => {
+                setLocation(e.target.value);
+                setAttractionId(null); // clear selection when typing
+              }}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               placeholder="Kota, tempat, atau destinasi..."
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
             />
           </div>
-          <div className="mt-3 space-y-0.5">
-            {SUGGESTIONS.map((s) => (
+          <div className="mt-3 space-y-0.5 max-h-60 overflow-y-auto">
+            {filtered.length === 0 && (
+              <p className="py-3 text-center text-xs text-zinc-400">
+                Tidak ada destinasi ditemukan
+              </p>
+            )}
+            {filtered.map((attraction) => (
               <button
-                key={s}
+                key={attraction.id}
                 type="button"
                 onClick={() => {
-                  setLocation(s);
+                  setLocation(attraction.name);
+                  setAttractionId(attraction.id);
                   setActive("date");
                 }}
                 className="flex w-full items-center gap-2.5 rounded-xl px-2 py-2.5 text-left text-sm text-zinc-700 transition hover:bg-zinc-50"
               >
                 <MapPin size={14} className="shrink-0 text-zinc-400" />
-                {s}
+                <span className="flex-1 line-clamp-1">{attraction.name}</span>
               </button>
             ))}
           </div>

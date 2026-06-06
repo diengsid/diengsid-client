@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 
 type SearchParams = {
   q?: string;
+  attraction_id?: string;
   check_in?: string;
   check_out?: string;
   adults?: string;
@@ -47,6 +48,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
   const search: SearchPropertyRequest = {
     key: location || undefined,
+    attraction_id: params.attraction_id || undefined,
     check_in: checkIn || undefined,
     check_out: checkOut || undefined,
     guest_count: guestCount > 0 ? guestCount : undefined,
