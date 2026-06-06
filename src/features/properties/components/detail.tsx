@@ -523,7 +523,7 @@ export default function DetailProperty({
                 </div>
                 <button
                   onClick={() => scrollToId("rooms")}
-                  className="flex items-center gap-1 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-xs font-medium text-zinc-600 transition hover:bg-zinc-200"
+                  className="flex cursor-pointer items-center gap-1 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-xs font-medium text-zinc-600 transition hover:bg-zinc-200"
                 >
                   <PenLine size={13} />
                   Ubah
@@ -562,7 +562,7 @@ export default function DetailProperty({
       </div>
 
       {/* ════ MOBILE BOTTOM BAR ════════════════════════════════════════════ */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-100 bg-white px-4 py-3 shadow-lg md:hidden">
+      <div className="fixed cursor-pointer bottom-0 left-0 right-0 z-50 border-t border-zinc-100 bg-white px-4 py-3 shadow-lg md:hidden">
         <div
           className="mb-2 flex items-center gap-1 text-sm"
           onClick={() => scrollToId("rooms")}
