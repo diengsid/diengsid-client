@@ -100,6 +100,8 @@ export default function DetailProperty({
   const nearbyAttractions = nearbyData?.data ?? [];
 
   const [modalBook, setModalBook] = useState<boolean>(false);
+  const [descOpen, setDescOpen] = useState(false);
+  const [dateModal, setDateModal] = useState(false);
 
   useEffect(() => {
     if (!rentableID || rentableID === rentableId) return;
@@ -329,6 +331,32 @@ export default function DetailProperty({
             {/* Description */}
             <section id="description">
               <div
+                className="prose prose-sm prose-zinc max-w-none font-light line-clamp-4
+                prose-headings:font-semibold prose-headings:text-zinc-900
+                prose-p:text-zinc-600 prose-p:leading-relaxed
+                prose-a:text-emerald-700 prose-strong:text-zinc-800"
+                dangerouslySetInnerHTML={{
+                  __html: property?.description ?? "",
+                }}
+              />
+              {property?.description && (
+                <button
+                  onClick={() => setDescOpen(true)}
+                  className="mt-3 cursor-pointer text-sm font-semibold text-zinc-900 underline underline-offset-2 hover:text-emerald-700 transition"
+                >
+                  Lihat selengkapnya
+                </button>
+              )}
+            </section>
+
+            {/* Description modal */}
+            <Modal
+              isOpen={descOpen}
+              onClose={() => setDescOpen(false)}
+              title={property?.title}
+              maxWidth="md"
+            >
+              <div
                 className="prose prose-sm prose-zinc max-w-none font-light
                 prose-headings:font-semibold prose-headings:text-zinc-900
                 prose-p:text-zinc-600 prose-p:leading-relaxed
@@ -337,7 +365,7 @@ export default function DetailProperty({
                   __html: property?.description ?? "",
                 }}
               />
-            </section>
+            </Modal>
 
             {/* ── Amenities ── */}
             {amenityGroups.length > 0 && (
@@ -574,12 +602,13 @@ export default function DetailProperty({
         </div>
 
         {/* ════ MOBILE BOTTOM BAR ════════════════════════════════════════════ */}
-        <div className="fixed cursor-pointer bottom-0 left-0 right-0 z-50 border-t border-zinc-100 bg-white px-4 py-3 shadow-lg md:hidden">
-          <div
-            className="mb-2 flex items-center gap-1 text-sm"
+        <div className="fixed bottom-0 left-0 right-0 z-50 select-none border-t border-zinc-100 bg-white px-4 py-3 shadow-lg md:hidden">
+          <button
+            type="button"
+            className="mb-2 flex w-full cursor-pointer items-center gap-1 text-sm active:opacity-70"
             onClick={() => scrollToId("rooms")}
           >
-            <DoorClosed size={14} className="text-zinc-400" />
+            <DoorClosed size={14} className="shrink-0 text-zinc-400" />
             <span className="font-medium text-zinc-700 underline">
               {rentable ? rentable.name : "Pilih kamar"}
             </span>
@@ -589,14 +618,18 @@ export default function DetailProperty({
                 {format(checkOut, "dd MMM", { locale: id })}
               </span>
             )}
-          </div>
+          </button>
           <div className="flex items-center gap-3">
-            <div
-              className="flex-1 cursor-pointer"
+            <button
+              type="button"
+              className="flex flex-1 cursor-pointer items-center gap-2 text-left active:opacity-70"
               onClick={() => setModalBook(true)}
             >
-              {renderPrice(true)}
-            </div>
+              <div className="flex-1">{renderPrice(true)}</div>
+              <span className="shrink-0 rounded-full border border-zinc-300 px-2.5 py-1 text-xs font-medium text-zinc-600">
+                Rincian
+              </span>
+            </button>
             <Button
               className="rounded-xl! px-6"
               disabled={isLoadingPrice || totalDays === 0}
@@ -640,6 +673,18 @@ export default function DetailProperty({
               </div>
             </div>
 
+            <button
+              type="button"
+              onClick={() => {
+                setModalBook(false);
+                setDateModal(true);
+              }}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-200 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 active:opacity-70"
+            >
+              <Calendar size={15} />
+              Ganti Tanggal
+            </button>
+
             <Button
               className="w-full rounded-xl! md:hidden"
               disabled={isLoadingPrice || totalDays === 0}
@@ -648,6 +693,23 @@ export default function DetailProperty({
               Pesan Sekarang
             </Button>
           </div>
+        </Modal>
+
+        {/* ════ DATE PICKER MODAL ════════════════════════════════════════════ */}
+        <Modal
+          isOpen={dateModal}
+          onClose={() => setDateModal(false)}
+          title="Pilih Tanggal"
+          maxWidth="md"
+        >
+          <DateRangePicker
+            value={dateRange}
+            onChange={(r) => {
+              handleDateChange(r);
+              if (r.start && r.end) setDateModal(false);
+            }}
+            disabledDates={disabledDates}
+          />
         </Modal>
       </div>
     </>
