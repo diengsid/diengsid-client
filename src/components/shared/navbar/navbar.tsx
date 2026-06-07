@@ -287,7 +287,7 @@ export default function Navbar({
     <>
       {/* ── mobile full-screen search overlay ── */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[200] flex flex-col bg-white md:hidden">
+        <div className="fixed inset-0 z-[10000] flex flex-col bg-white md:hidden">
           {/* top */}
           <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
             <div className="flex gap-1">
