@@ -10,12 +10,14 @@ import Login from "@/features/auth/components/login";
 import { useCurrentUser, useLogout } from "@/features/auth/hooks/use-auth";
 import { useScroll } from "@/hooks/use-scroll";
 import { cn } from "@/lib/utils";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getAttractions } from "@/features/attractions/services/attraction-service";
 import { format, parseISO } from "date-fns";
 import { id } from "date-fns/locale";
 import {
   ChevronDown,
   LogOut,
+  MapPin,
   Minus,
   Navigation,
   Plus,
@@ -164,6 +166,19 @@ export default function Navbar({
     baby: 0,
   });
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileAttractionId, setMobileAttractionId] = useState<string | null>(null);
+
+  const { data: attractionsData } = useQuery({
+    queryKey: ["attractions"],
+    queryFn: getAttractions,
+    staleTime: 10 * 60 * 1000,
+  });
+  const attractions = attractionsData?.data ?? [];
+  const mobileFiltered = mobileLocation.trim()
+    ? attractions.filter((a) =>
+        a.name.toLowerCase().includes(mobileLocation.toLowerCase()),
+      )
+    : attractions;
 
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const { data: user } = useCurrentUser(!!token);
@@ -242,13 +257,18 @@ export default function Navbar({
 
   const clearMobileSearch = () => {
     setMobileLocation("");
+    setMobileAttractionId(null);
     setMobileDateRange({ start: null, end: null });
     setMobileGuests({ adult: 1, child: 0, baby: 0 });
   };
 
   const handleMobileSearch = () => {
     const params = new URLSearchParams();
-    if (mobileLocation.trim()) params.set("q", mobileLocation.trim());
+    if (mobileAttractionId) {
+      params.set("attraction_id", mobileAttractionId);
+    } else if (mobileLocation.trim()) {
+      params.set("q", mobileLocation.trim());
+    }
     if (mobileDateRange.start)
       params.set("check_in", format(mobileDateRange.start, "yyyy-MM-dd"));
     if (mobileDateRange.end)
@@ -342,13 +362,33 @@ export default function Navbar({
                     <input
                       autoFocus
                       value={mobileLocation}
-                      onChange={(e) => setMobileLocation(e.target.value)}
+                      onChange={(e) => {
+                        setMobileLocation(e.target.value);
+                        setMobileAttractionId(null);
+                      }}
                       onKeyDown={(e) =>
                         e.key === "Enter" && setMobileSection("date")
                       }
                       placeholder="Kota, tempat, atau destinasi..."
                       className="flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
                     />
+                  </div>
+                  <div className="mt-2 max-h-52 overflow-y-auto space-y-0.5">
+                    {mobileFiltered.map((attraction) => (
+                      <button
+                        key={attraction.id}
+                        type="button"
+                        onClick={() => {
+                          setMobileLocation(attraction.name);
+                          setMobileAttractionId(attraction.id);
+                          setMobileSection("date");
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-xl px-2 py-2.5 text-left text-sm text-zinc-700 transition hover:bg-zinc-50"
+                      >
+                        <MapPin size={14} className="shrink-0 text-zinc-400" />
+                        <span className="line-clamp-1">{attraction.name}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}

@@ -189,7 +189,7 @@ export default function SearchMap({ properties, hoveredId }: Props) {
     <div className="h-full w-full">
       <MapContainer
         center={center}
-        zoom={11}
+        zoom={15}
         scrollWheelZoom
         style={{ height: "100%", width: "100%" }}
         className="z-0"

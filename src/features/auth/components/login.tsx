@@ -248,7 +248,6 @@ export default function Login({ onClose, onSuccess }: Props): React.ReactNode {
             <Input
               label="Email Anda"
               type="email"
-              autoFocus
               error={emailForm.formState.errors.email?.message}
               {...emailForm.register("email")}
             />
@@ -269,7 +268,10 @@ export default function Login({ onClose, onSuccess }: Props): React.ReactNode {
             <div className="flex justify-center">
               <GoogleLogin
                 onSuccess={(cred) =>
-                  authGoogle.mutate({ token: cred.credential ?? "" })
+                  authGoogle.mutate(
+                    { token: cred.credential ?? "" },
+                    { onSuccess: handleSuccess },
+                  )
                 }
                 onError={() =>
                   emailForm.setError("email", { message: "Login Google gagal." })
@@ -290,7 +292,6 @@ export default function Login({ onClose, onSuccess }: Props): React.ReactNode {
             <Input
               label="Nama lengkap"
               type="text"
-              autoFocus
               error={registerForm.formState.errors.name?.message}
               {...registerForm.register("name")}
             />
@@ -336,7 +337,6 @@ export default function Login({ onClose, onSuccess }: Props): React.ReactNode {
                   inputMode="numeric"
                   maxLength={1}
                   value={digit}
-                  autoFocus={i === 0}
                   onChange={(e) => handleOtpChange(i, e.target.value)}
                   onKeyDown={(e) => handleOtpKeyDown(i, e)}
                   className={clsx(
@@ -376,7 +376,6 @@ export default function Login({ onClose, onSuccess }: Props): React.ReactNode {
               show={showPassword}
               onToggle={() => setShowPassword((v) => !v)}
               error={passwordForm.formState.errors.password?.message}
-              autoFocus
               {...passwordForm.register("password")}
             />
             <Button
@@ -405,7 +404,6 @@ export default function Login({ onClose, onSuccess }: Props): React.ReactNode {
               show={showRegPassword}
               onToggle={() => setShowRegPassword((v) => !v)}
               error={registerPasswordForm.formState.errors.password?.message}
-              autoFocus
               {...registerPasswordForm.register("password")}
             />
             <Button

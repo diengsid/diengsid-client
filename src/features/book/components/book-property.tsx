@@ -140,7 +140,11 @@ export default function BookProperty({
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-20 bg-white border-b">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href={`/penginapan/${propertyId}`}>
+          <Link href={`/penginapan/${propertyId}?${new URLSearchParams({
+              ...(localDateRange.start ? { check_in: format(localDateRange.start, "yyyy-MM-dd") } : {}),
+              ...(localDateRange.end ? { check_out: format(localDateRange.end, "yyyy-MM-dd") } : {}),
+              ...(rentableId ? { rentable_id: rentableId } : {}),
+            }).toString()}`}>
             <Button variant="ghost" size="sm">
               <X size={20} />
             </Button>
@@ -288,7 +292,7 @@ export default function BookProperty({
               <p className="text-sm text-zinc-500">
                 Konfirmasi booking akan dikirim ke nomor ini.
               </p>
-              <div className="flex items-center gap-2 border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-zinc-900 mt-1">
+              <div className={`flex items-center gap-2 border rounded-lg overflow-hidden focus-within:ring-2 mt-1 ${phoneNumber.trim().length > 0 && phoneNumber.trim().length < 8 ? "border-red-400 focus-within:ring-red-400" : "focus-within:ring-zinc-900"}`}>
                 <span className="bg-zinc-50 border-r px-3 py-2.5 text-sm text-zinc-500 shrink-0">
                   +62
                 </span>
@@ -302,6 +306,18 @@ export default function BookProperty({
                   className="flex-1 px-3 py-2.5 text-sm outline-none bg-white"
                 />
               </div>
+              {phoneNumber.trim().length === 0 && (
+                <p className="flex items-center gap-1.5 text-xs text-amber-600 mt-1">
+                  <span>⚠️</span>
+                  Nomor WhatsApp wajib diisi untuk konfirmasi booking.
+                </p>
+              )}
+              {phoneNumber.trim().length > 0 && phoneNumber.trim().length < 8 && (
+                <p className="flex items-center gap-1.5 text-xs text-red-500 mt-1">
+                  <span>⚠️</span>
+                  Nomor terlalu pendek, minimal 8 digit.
+                </p>
+              )}
             </div>
 
             {/* Payment option */}
