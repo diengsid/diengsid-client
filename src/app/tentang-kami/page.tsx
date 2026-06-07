@@ -150,7 +150,7 @@ export default async function TentangKamiPage() {
               href="/artikel"
               className="rounded-xl border border-white/40 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
             >
-              Baca Artikel
+              Baca Panduan Wisata
             </Link>
           </div>
         </div>
