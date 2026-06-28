@@ -34,7 +34,7 @@ interface Props {
   token?: string;
 }
 
-export default function MenuBar({ token }: Props): React.ReactNode {
+export default function MenuBarBottom({ token }: Props): React.ReactNode {
   const pathname = usePathname();
 
   const menu = !token

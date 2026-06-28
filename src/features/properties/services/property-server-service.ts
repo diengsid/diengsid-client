@@ -30,3 +30,11 @@ export async function serverDetailProperty(
   if (!data) return null;
   return { success: true, message: "ok", data };
 }
+
+export async function serverDetailPropertyBySlug(
+  slug: string,
+): Promise<ResponseData<Property> | null> {
+  const data = await serverFetch<Property>(`/properties/slug/${slug}`, { revalidate: 0 });
+  if (!data) return null;
+  return { success: true, message: "ok", data };
+}

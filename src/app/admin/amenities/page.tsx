@@ -1,19 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  getAmenities,
-  createAmenity,
+  AmenityIcon,
+  ICON_KEYS,
+} from "@/features/admin/components/amenity-icon";
+import {
   AmenityRequest,
   AmenityResponse,
+  createAmenity,
+  getAmenities,
 } from "@/features/admin/services/admin-service";
-import { Plus, Search, X, Sparkles } from "lucide-react";
-import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
-import { ICON_KEYS, AmenityIcon } from "@/features/admin/components/amenity-icon";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Plus, Search, Sparkles, X } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
-const CATEGORIES = ["umum", "kamar", "dapur", "outdoor", "keamanan", "lainnya"];
+const CATEGORIES = [
+  "Kamar & Tempat Tidur",
+  "Kamar Mandi",
+  "Teknologi & Hiburan",
+  "Makanan & Minuman",
+  "Fasilitas Umum",
+  "Layanan & Staf",
+  "Keamanan",
+  "Amenitas Khusus / Premium",
+  "lainnya",
+];
 
 function CreateModal({ onClose }: { onClose: () => void }) {
   const queryClient = useQueryClient();
@@ -35,7 +48,8 @@ function CreateModal({ onClose }: { onClose: () => void }) {
       toast.success("Amenity berhasil ditambahkan");
       onClose();
     },
-    onError: (err: Error) => toast.error(err.message ?? "Gagal menambahkan amenity"),
+    onError: (err: Error) =>
+      toast.error(err.message ?? "Gagal menambahkan amenity"),
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -48,7 +62,10 @@ function CreateModal({ onClose }: { onClose: () => void }) {
       <div className="w-full max-w-lg rounded-2xl bg-white shadow-custom-lg flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4 shrink-0">
           <h3 className="font-semibold text-zinc-900">Tambah Amenity</h3>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100">
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100"
+          >
             <X size={18} />
           </button>
         </div>
@@ -62,21 +79,29 @@ function CreateModal({ onClose }: { onClose: () => void }) {
               <input
                 required
                 value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, name: e.target.value }))
+                }
                 className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-primary-700 focus:ring-1 focus:ring-primary-700/20"
                 placeholder="Contoh: Wi-Fi, Kolam Renang, AC"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-medium text-zinc-600">Kategori</label>
+              <label className="text-xs font-medium text-zinc-600">
+                Kategori
+              </label>
               <select
                 value={form.category}
-                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, category: e.target.value }))
+                }
                 className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-primary-700 capitalize"
               >
                 {CATEGORIES.map((c) => (
-                  <option key={c} value={c} className="capitalize">{c}</option>
+                  <option key={c} value={c} className="capitalize">
+                    {c}
+                  </option>
                 ))}
               </select>
             </div>
@@ -84,7 +109,10 @@ function CreateModal({ onClose }: { onClose: () => void }) {
             <div className="space-y-2">
               <label className="text-xs font-medium text-zinc-600">Icon</label>
               <div className="relative">
-                <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
+                <Search
+                  size={13}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"
+                />
                 <input
                   value={iconSearch}
                   onChange={(e) => setIconSearch(e.target.value)}
@@ -131,7 +159,9 @@ function CreateModal({ onClose }: { onClose: () => void }) {
                   <p className="text-sm font-medium text-zinc-900">
                     {form.name || "Nama amenity"}
                   </p>
-                  <p className="text-xs text-zinc-400 capitalize">{form.category}</p>
+                  <p className="text-xs text-zinc-400 capitalize">
+                    {form.category}
+                  </p>
                 </div>
               </div>
             </div>
@@ -183,19 +213,25 @@ export default function AmenitiesPage() {
     queryFn: getAmenities,
   });
 
-  const amenities: AmenityResponse[] = Array.isArray(data?.data) ? data.data : [];
+  const amenities: AmenityResponse[] = Array.isArray(data?.data)
+    ? data.data
+    : [];
 
   const filtered = amenities.filter((a) => {
     const matchSearch = a.name.toLowerCase().includes(search.toLowerCase());
-    const matchCategory = categoryFilter === "all" || a.category === categoryFilter;
+    const matchCategory =
+      categoryFilter === "all" || a.category === categoryFilter;
     return matchSearch && matchCategory;
   });
 
-  const grouped = CATEGORIES.reduce<Record<string, AmenityResponse[]>>((acc, cat) => {
-    const items = filtered.filter((a) => a.category === cat);
-    if (items.length > 0) acc[cat] = items;
-    return acc;
-  }, {});
+  const grouped = CATEGORIES.reduce<Record<string, AmenityResponse[]>>(
+    (acc, cat) => {
+      const items = filtered.filter((a) => a.category === cat);
+      if (items.length > 0) acc[cat] = items;
+      return acc;
+    },
+    {},
+  );
 
   const ungrouped = filtered.filter((a) => !CATEGORIES.includes(a.category));
 
@@ -204,7 +240,9 @@ export default function AmenitiesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-zinc-900">Amenities</h1>
-          <p className="text-sm text-zinc-500">{amenities.length} amenity terdaftar</p>
+          <p className="text-sm text-zinc-500">
+            {amenities.length} amenity terdaftar
+          </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -217,7 +255,10 @@ export default function AmenitiesPage() {
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+          />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -232,7 +273,9 @@ export default function AmenitiesPage() {
         >
           <option value="all">Semua Kategori</option>
           {CATEGORIES.map((c) => (
-            <option key={c} value={c} className="capitalize">{c}</option>
+            <option key={c} value={c} className="capitalize">
+              {c}
+            </option>
           ))}
         </select>
       </div>
@@ -240,7 +283,10 @@ export default function AmenitiesPage() {
       {isLoading ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} className="h-16 animate-pulse rounded-xl bg-zinc-100" />
+            <div
+              key={i}
+              className="h-16 animate-pulse rounded-xl bg-zinc-100"
+            />
           ))}
         </div>
       ) : filtered.length === 0 ? (

@@ -43,6 +43,7 @@ export const HostSchema = z.object({
 
 export const PropertySchema = z.object({
   id: z.string(),
+  slug: z.string().optional().default(""),
   property_type: z.string(),
   booking_type: z.string().optional().default(""),
   title: z.string(),

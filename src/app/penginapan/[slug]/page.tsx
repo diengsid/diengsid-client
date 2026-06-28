@@ -3,7 +3,7 @@ import { JsonLd } from "@/components/shared/json-ld";
 import Navbar from "@/components/shared/navbar/navbar";
 import DetailProperty from "@/features/properties/components/detail";
 import NavbarDetailProperty from "@/features/properties/components/navbar";
-import { serverDetailProperty } from "@/features/properties/services/property-server-service";
+import { serverDetailPropertyBySlug } from "@/features/properties/services/property-server-service";
 import { parseLocalDate } from "@/lib/date";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{
-    id: string;
+    slug: string;
   }>;
   searchParams: Promise<{
     check_in?: string;
@@ -23,8 +23,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    const { id } = await params;
-    const result = await serverDetailProperty(id);
+    const { slug } = await params;
+    const result = await serverDetailPropertyBySlug(slug);
     if (!result) throw new Error("not found");
     const { data: property } = result;
     const description =
@@ -38,10 +38,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: property.title,
         description,
         images: [{ url: image, alt: property.title }],
-        url: `https://diengs.id/penginapan/${id}`,
+        url: `https://diengs.id/penginapan/${slug}`,
         type: "website",
       },
-      alternates: { canonical: `https://diengs.id/penginapan/${id}` },
+      alternates: { canonical: `https://diengs.id/penginapan/${slug}` },
     };
   } catch {
     return { title: "Detail Penginapan Dieng" };
@@ -52,7 +52,7 @@ export default async function DetailPropertyPage({
   params,
   searchParams,
 }: Props) {
-  const { id } = await params;
+  const { slug } = await params;
   const { check_in, check_out, rentable_id } = await searchParams;
   const checkInDate = parseLocalDate(check_in);
   const checkOutDate = parseLocalDate(check_out);
@@ -61,8 +61,7 @@ export default async function DetailPropertyPage({
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
-  // fetch for JSON-LD — Next.js deduplicates identical requests within the same render
-  const propertyData = await serverDetailProperty(id).catch(() => null);
+  const propertyData = await serverDetailPropertyBySlug(slug).catch(() => null);
   const property = propertyData?.data;
 
   const minPrice = property?.rentable?.length
@@ -77,10 +76,10 @@ export default async function DetailPropertyPage({
             data={{
               "@context": "https://schema.org",
               "@type": "LodgingBusiness",
-              "@id": `https://diengs.id/penginapan/${id}`,
+              "@id": `https://diengs.id/penginapan/${slug}`,
               name: property.title,
               description: property.description,
-              url: `https://diengs.id/penginapan/${id}`,
+              url: `https://diengs.id/penginapan/${slug}`,
               image: property.thumbnail_url ?? "https://diengs.id/og-image.jpg",
               address: {
                 "@type": "PostalAddress",
@@ -126,7 +125,7 @@ export default async function DetailPropertyPage({
                   "@type": "ListItem",
                   position: 2,
                   name: property.title,
-                  item: `https://diengs.id/penginapan/${id}`,
+                  item: `https://diengs.id/penginapan/${slug}`,
                 },
               ],
             }}
@@ -146,7 +145,7 @@ export default async function DetailPropertyPage({
 
       {/* detail section */}
       <DetailProperty
-        propertyId={id}
+        propertySlug={slug}
         checkIn={checkInDate}
         checkOut={checkOutDate}
         rentableId={rentableId}

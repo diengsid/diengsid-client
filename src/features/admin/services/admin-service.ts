@@ -72,6 +72,7 @@ export type PropertyCreateRequest = {
   property_type: string;
   booking_type: string;
   title: string;
+  slug?: string;
   address: string;
   description: string;
   thumbnail_url?: string;

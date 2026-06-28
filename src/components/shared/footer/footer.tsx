@@ -1,6 +1,100 @@
 import Image from "next/image";
 import Link from "next/link";
 
+const PAYMENT_METHODS = [
+  {
+    label: "Visa",
+    src: "https://upload.wikimedia.org/wikipedia/commons/5/5c/Visa_Inc._logo_%282021%E2%80%93present%29.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "Mastercard",
+    src: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "BCA",
+    src: "https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "BNI",
+    src: "https://upload.wikimedia.org/wikipedia/commons/f/f0/Bank_Negara_Indonesia_logo_%282004%29.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "BRI",
+    src: "https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_2020.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "Mandiri",
+    src: "https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "Permata",
+    src: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Permata_Bank_%282024%29.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "OVO",
+    src: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "GoPay",
+    src: "https://upload.wikimedia.org/wikipedia/commons/0/00/Logo_Gopay.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "Dana",
+    src: "https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "ShopeePay",
+    src: "https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "Alfamart",
+    src: "https://upload.wikimedia.org/wikipedia/commons/8/86/Alfamart_logo.svg",
+    bg: "bg-white",
+  },
+  {
+    label: "Indomaret",
+    src: "https://upload.wikimedia.org/wikipedia/commons/4/44/Indomaret.svg",
+    bg: "bg-white",
+  },
+] as const;
+
+function PaymentLogo({
+  label,
+  src,
+  bg,
+}: {
+  label: string;
+  src: string;
+  bg: string;
+}) {
+  return (
+    <div
+      className={`flex h-9 w-16 shrink-0 items-center justify-center rounded-lg border border-zinc-200 px-2 ${bg}`}
+      title={label}
+    >
+      <Image
+        src={src}
+        alt={label}
+        width={52}
+        height={24}
+        className="h-5 w-auto object-contain"
+        unoptimized
+      />
+    </div>
+  );
+}
+
 export function Footer() {
   return (
     <footer className="border-t border-zinc-100 bg-zinc-50 pt-10 pb-20 ">
@@ -30,7 +124,7 @@ export function Footer() {
                 </svg>
               </a>
               <a
-                href="https://wa.me/6285155380996"
+                href="https://wa.me/6285174366013"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-500 transition hover:border-zinc-400 hover:text-zinc-800"
@@ -127,20 +221,32 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://wa.me/6285155380996"
+                  href="https://wa.me/6285174366013"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition hover:text-zinc-800"
                 >
-                  +62 851-5538-0996
+                  +62 851-7436-6013
                 </a>
               </li>
             </ul>
           </div>
         </div>
 
+        {/* Payment methods */}
+        <div className="mt-10 border-t border-zinc-100 pt-8">
+          <p className="mb-3 text-xs font-semibold text-zinc-400 uppercase tracking-wide">
+            Pembayaran Aman via DOKU
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            {PAYMENT_METHODS.map((p) => (
+              <PaymentLogo key={p.label} {...p} />
+            ))}
+          </div>
+        </div>
+
         {/* Bottom bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-zinc-100 pt-6 text-xs text-zinc-400 md:flex-row">
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-zinc-100 pt-6 text-xs text-zinc-400 md:flex-row">
           <span>© 2026 Diengs.id · Dibuat dengan ❤️ dari Dieng, Wonosobo</span>
           <div className="flex gap-5">
             <Link href="#" className="transition hover:text-zinc-600">

@@ -70,11 +70,15 @@ export default function SearchBar({
     queryFn: getAttractions,
     staleTime: 10 * 60 * 1000,
   });
-  const attractions = useMemo(() => attractionsData?.data ?? [], [attractionsData]);
+  const attractions = useMemo(
+    () => attractionsData?.data ?? [],
+    [attractionsData],
+  );
 
   const resolvedRef = useRef(false);
   useEffect(() => {
-    if (resolvedRef.current || !defaultAttractionId || !attractions.length) return;
+    if (resolvedRef.current || !defaultAttractionId || !attractions.length)
+      return;
     const found = attractions.find((a) => a.id === defaultAttractionId);
     if (found) {
       setLocation(found.name);
@@ -249,7 +253,7 @@ export default function SearchBar({
 
       {/* ── date dropdown ── */}
       {active === "date" && (
-        <div className="absolute left-0 right-0 top-full z-9999 mt-3 rounded-2xl bg-white shadow-custom-lg overflow-hidden">
+        <div className="absolute max-w-3xl left-0 right-0 top-full z-9999 mt-3 rounded-2xl bg-white shadow-custom-lg overflow-hidden">
           <DateRangePicker
             value={dateRange}
             onChange={(r: DateRange) => {

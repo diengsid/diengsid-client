@@ -30,12 +30,14 @@ export default function PropertyItemCard({ property }: Props): React.ReactNode {
 
   const basePrice = cheapestRentable?.base_price ?? null;
   const discount = cheapestRentable?.discount ?? 0;
-  const finalPrice = basePrice != null ? basePrice * (1 - discount / 100) : null;
+  const finalPrice =
+    basePrice != null ? basePrice * (1 - discount / 100) : null;
 
   const handleClick = () => {
+    const identifier = property.slug || property.id;
     const url =
       "/penginapan/" +
-      property.id +
+      identifier +
       "?check_in=" +
       tomorrow.toISOString().split("T")[0] +
       "&check_out=" +

@@ -1,12 +1,145 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { MapPin } from "lucide-react";
+import { addDays } from "date-fns";
+import { ArrowRight, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { addDays } from "date-fns";
-import { getProperties } from "../services/property-service";
+import { useRef } from "react";
 import type { Property } from "../schemas/schema-property";
+import { getProperties } from "../services/property-service";
+
+// ── skeleton card ────────────────────────────────────────────────────────────
+
+function CardSkeleton() {
+  return (
+    <div className="flex w-48 shrink-0 flex-col gap-2">
+      <div className="h-48 w-48 animate-pulse rounded-2xl bg-zinc-200" />
+      <div className="h-4 w-3/4 animate-pulse rounded-full bg-zinc-200" />
+      <div className="h-3 w-1/2 animate-pulse rounded-full bg-zinc-200" />
+      <div className="h-3 w-2/3 animate-pulse rounded-full bg-zinc-200" />
+    </div>
+  );
+}
+
+// ── home page carousel ────────────────────────────────────────────────────────
+
+export default function PropertyRecomendation() {
+  const tomorrow = addDays(new Date(), 1);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["property-recommendation-home"],
+    queryFn: () => getProperties({ page: 1, size: 12 }),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const properties = data?.data ?? [];
+
+  const scroll = (dir: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir === "right" ? 220 : -220, behavior: "smooth" });
+  };
+
+  const href = (p: Property) => {
+    const id = p.slug || p.id;
+    return (
+      `/penginapan/${id}` +
+      `?check_in=${tomorrow.toISOString().split("T")[0]}` +
+      `&check_out=${addDays(tomorrow, 1).toISOString().split("T")[0]}`
+    );
+  };
+
+  return (
+    <section className="px-4 py-6 md:px-12 lg:px-20">
+      {/* header */}
+      <div className="mb-5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-bold text-zinc-900">Rekomendasi Penginapan</h2>
+          <Link
+            href="/penginapan"
+            className="flex h-7 w-7 items-center justify-center rounded-full border border-zinc-300 text-zinc-600 hover:bg-zinc-100 transition"
+          >
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+
+        {/* nav arrows */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => scroll("left")}
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 transition"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={() => scroll("right")}
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 transition"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* carousel */}
+      <div
+        ref={scrollRef}
+        className="flex gap-4 overflow-x-auto scrollbar-hide pb-2"
+      >
+        {isLoading
+          ? Array.from({ length: 5 }).map((_, i) => <CardSkeleton key={i} />)
+          : properties.map((p) => {
+              const price = cheapestFinalPrice(p);
+              const thumbnail =
+                p.thumbnail_url ||
+                p.images?.find((img) => img.is_primary)?.image_url ||
+                p.images?.[0]?.image_url ||
+                null;
+
+              return (
+                <Link
+                  key={p.id}
+                  href={href(p)}
+                  className="group flex w-48 shrink-0 flex-col gap-1.5"
+                >
+                  <div className="relative h-48 w-48 overflow-hidden rounded-2xl bg-zinc-200">
+                    {thumbnail ? (
+                      <Image
+                        fill
+                        src={thumbnail}
+                        alt={p.title}
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        unoptimized
+                      />
+                    ) : null}
+                  </div>
+                  <p className="line-clamp-1 text-sm font-semibold text-zinc-900">
+                    {p.title}
+                  </p>
+                  {p.address && (
+                    <p className="flex items-center gap-1 text-xs text-zinc-400">
+                      <MapPin size={11} className="shrink-0" />
+                      <span className="line-clamp-1">{p.address}</span>
+                    </p>
+                  )}
+                  {price ? (
+                    <p className="text-sm font-semibold text-zinc-900">
+                      Rp {price.final.toLocaleString("id-ID")}
+                      <span className="text-xs font-normal text-zinc-400"> / malam</span>
+                    </p>
+                  ) : null}
+                </Link>
+              );
+            })}
+      </div>
+    </section>
+  );
+}
+
+// ── detail page similar properties ───────────────────────────────────────────
 
 interface Props {
   currentId: string;
@@ -89,8 +222,9 @@ export function PropertyRecommendations({ currentId, propertyType }: Props) {
               property.images?.[0]?.image_url ||
               null;
 
+            const identifier = property.slug || property.id;
             const href =
-              `/penginapan/${property.id}` +
+              `/penginapan/${identifier}` +
               `?check_in=${tomorrow.toISOString().split("T")[0]}` +
               `&check_out=${addDays(tomorrow, 1).toISOString().split("T")[0]}`;
 

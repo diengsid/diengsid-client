@@ -53,7 +53,6 @@ const PROPERTY_TYPES = [
   "guesthouse",
   "apartment",
   "cabin",
-  "villa",
   "cottage",
   "glamping",
 ];
@@ -70,6 +69,7 @@ type HostMode = "new" | "existing";
 
 type PropData = {
   title: string;
+  slug: string;
   address: string;
   lat: number | null;
   lng: number | null;
@@ -283,6 +283,7 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
   // ── step 1: property ───────────────────────────────────────────────────────
   const [prop, setProp] = useState<PropData>({
     title: "",
+    slug: "",
     address: "",
     lat: null,
     lng: null,
@@ -408,6 +409,7 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
               property_type: prop.property_type,
               booking_type: prop.booking_type,
               title: prop.title,
+              slug: prop.slug.trim() || undefined,
               address: prop.address,
               description: prop.description,
               thumbnail_url: primaryImg?.url,
@@ -422,6 +424,7 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
               property_type: prop.property_type,
               booking_type: prop.booking_type,
               title: prop.title,
+              slug: prop.slug.trim() || undefined,
               address: prop.address,
               description: prop.description,
               thumbnail_url: primaryImg?.url,
@@ -506,6 +509,28 @@ export function CreateListingWizard({ onClose }: { onClose: () => void }) {
                     }
                     className={inputCls}
                     placeholder="Nama properti"
+                  />
+                </div>
+
+                <div className="col-span-2 space-y-1">
+                  <label className={labelCls}>
+                    Slug URL{" "}
+                    <span className="text-zinc-400 font-normal">
+                      (opsional — otomatis dari judul)
+                    </span>
+                  </label>
+                  <input
+                    value={prop.slug}
+                    onChange={(e) => {
+                      const raw = e.target.value
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")
+                        .replace(/[^a-z0-9-]/g, "")
+                        .replace(/-+/g, "-");
+                      setProp((s) => ({ ...s, slug: raw }));
+                    }}
+                    className={inputCls}
+                    placeholder="contoh: villa-dieng-indah (kosongkan untuk auto)"
                   />
                 </div>
 

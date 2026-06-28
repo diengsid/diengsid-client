@@ -3,6 +3,12 @@
 @import "shadcn/tailwind.css";
 @plugin "@tailwindcss/typography";
 
+@utility scrollbar-hide {
+  &::-webkit-scrollbar { display: none; }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* ── TipTap editor content styles ── */
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);

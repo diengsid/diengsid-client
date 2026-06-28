@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import DateRangePicker, {
@@ -6,12 +5,12 @@ import DateRangePicker, {
 } from "@/components/shared/date-range-picker/date-range-picker";
 import SearchBar from "@/components/shared/search-bar/SearchBar";
 import { Logo } from "@/components/ui/logo/logo";
+import { getAttractions } from "@/features/attractions/services/attraction-service";
 import Login from "@/features/auth/components/login";
 import { useCurrentUser, useLogout } from "@/features/auth/hooks/use-auth";
 import { useScroll } from "@/hooks/use-scroll";
 import { cn } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAttractions } from "@/features/attractions/services/attraction-service";
 import { format, parseISO } from "date-fns";
 import { id } from "date-fns/locale";
 import {
@@ -97,6 +96,10 @@ function CompactPill({
       <span className="pl-4 pr-2 py-2.5 text-sm text-zinc-500">
         {guestLabel}
       </span>
+      <kbd className="mx-2 hidden items-center gap-0.5 rounded border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400 lg:flex">
+        <span>⌘</span>
+        <span>K</span>
+      </kbd>
       <div className="mr-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shrink-0">
         <Search size={14} />
       </div>
@@ -117,19 +120,9 @@ export default function Navbar({
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
-  const isOnHomePage = pathname === "/";
-
-  // Compact mode: NOT home page, OR scrolled past threshold on home page
-  const isCompact = !isOnHomePage || scrollY > 80;
-
   const [searchOpen, setSearchOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
-
-  // Close search dropdown when entering compact mode by scrolling
-  useEffect(() => {
-    if (!isCompact) setSearchOpen(false);
-  }, [isCompact]);
 
   // Active category from pathname — match against each category's href
   const activeCategory: Category =
@@ -166,7 +159,9 @@ export default function Navbar({
     baby: 0,
   });
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileAttractionId, setMobileAttractionId] = useState<string | null>(null);
+  const [mobileAttractionId, setMobileAttractionId] = useState<string | null>(
+    null,
+  );
 
   const { data: attractionsData } = useQuery({
     queryKey: ["attractions"],
@@ -181,7 +176,7 @@ export default function Navbar({
     : attractions;
 
   const profileMenuRef = useRef<HTMLDivElement>(null);
-  const { data: user } = useCurrentUser(!!token);
+  const { data: user, isLoading: isUserLoading } = useCurrentUser(!!token);
   const logout = useLogout();
 
   useEffect(() => {
@@ -201,6 +196,15 @@ export default function Navbar({
       if (e.key === "Escape") {
         setSearchOpen(false);
         setMobileOpen(false);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
+          setMobileOpen((v) => !v);
+        } else {
+          setSearchOpen((v) => !v);
+        }
       }
     };
     window.addEventListener("keydown", handler);
@@ -408,7 +412,7 @@ export default function Navbar({
                 onClick={() =>
                   setMobileSection(mobileSection === "date" ? null : "date")
                 }
-                className="flex w-full cursor-pointer items-center justify-between px-4 py-3"
+                className="hidden  w-full cursor-pointer items-center justify-between px-4 py-3"
               >
                 <div className="text-left">
                   <p className="text-xs font-bold text-zinc-900">Tanggal</p>
@@ -555,10 +559,15 @@ export default function Navbar({
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="flex flex-1 cursor-pointer items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2.5 shadow-sm active:scale-[0.98] transition-transform"
+              className="hidden flex-1 cursor-pointer items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2.5 shadow-sm active:scale-[0.98] transition-transform"
             >
               <Search size={15} className="shrink-0 text-zinc-400" />
-              <span className="text-sm text-zinc-400">Mulai pencarian</span>
+              <span className="flex-1 text-sm text-zinc-400">
+                Mulai pencarian
+              </span>
+              <kbd className="rounded border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">
+                ⌘K
+              </kbd>
             </button>
           </div>
 
@@ -567,100 +576,95 @@ export default function Navbar({
             {/* left: logo */}
             <Logo scrollY={scrollY} />
 
-            {/* center: search widget */}
-            <div className="flex flex-1 justify-center mx-4 max-w-2xl">
-              {!isCompact ? (
-                // Expanded search bar inline (home page, top)
-                <div className="w-full">
-                  <SearchBar
-                    onSearch={() => {}}
-                    defaultLocation={searchParams.get("q") ?? ""}
-                    defaultAttractionId={searchParams.get("attraction_id") ?? ""}
-                    defaultCheckIn={rawCheckIn ? parseISO(rawCheckIn) : null}
-                    defaultCheckOut={rawCheckOut ? parseISO(rawCheckOut) : null}
-                    defaultGuests={{
-                      adult: parseInt(searchParams.get("adults") ?? "1"),
-                      child: parseInt(searchParams.get("children") ?? "0"),
-                      baby: parseInt(searchParams.get("babies") ?? "0"),
-                    }}
-                  />
-                </div>
-              ) : (
-                // Compact pill
-
-                <CompactPill
-                  onClick={() => setSearchOpen((v) => !v)}
-                  location={summaryLocation}
-                  dateLabel={summaryDates}
-                  guestLabel={summaryGuests}
-                />
-              )}
+            {/* center: compact search pill */}
+            <div className="hidden flex-1 justify-center mx-4 max-w-2xl">
+              <CompactPill
+                onClick={() => setSearchOpen((v) => !v)}
+                location={summaryLocation}
+                dateLabel={summaryDates}
+                guestLabel={summaryGuests}
+              />
             </div>
 
             {/* right: profile / login */}
-            <div className="flex items-center justify-end gap-2">
+            <div className="flex items-center justify-end gap-3">
+              <a
+                href="https://wa.me/6285174366013?text=Halo%2C%20saya%20ingin%20mendaftarkan%20properti%20di%20Diengs.id"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden lg:flex items-center gap-1.5 rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 hover:shadow-sm"
+              >
+                Menjadi tuan rumah
+              </a>
               {token ? (
-                <div className="relative" ref={profileMenuRef}>
-                  <button
-                    onClick={() => setShowProfileMenu((v) => !v)}
-                    className="flex cursor-pointer items-center gap-2 rounded-full border border-zinc-200 p-1 pr-3 transition hover:shadow-md"
-                  >
-                    {user?.picture ? (
-                      <Image
-                        src={user.picture}
-                        alt={user.name}
-                        width={32}
-                        height={32}
-                        className="h-8 w-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-semibold text-white">
-                        {initials}
+                isUserLoading ? (
+                  <div className="flex items-center gap-2 rounded-full border border-zinc-200 p-1 pr-3 animate-pulse">
+                    <div className="h-8 w-8 rounded-full bg-zinc-200 shrink-0" />
+                    <div className="h-3.5 w-20 rounded-full bg-zinc-200" />
+                  </div>
+                ) : (
+                  <div className="relative" ref={profileMenuRef}>
+                    <button
+                      onClick={() => setShowProfileMenu((v) => !v)}
+                      className="flex cursor-pointer items-center gap-2 rounded-full border border-zinc-200 p-1 pr-3 transition hover:shadow-md"
+                    >
+                      {user?.picture ? (
+                        <Image
+                          src={user.picture}
+                          alt={user.name}
+                          width={32}
+                          height={32}
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-semibold text-white">
+                          {initials}
+                        </div>
+                      )}
+                      <span className="max-w-24 truncate text-sm font-medium text-zinc-800">
+                        {firstName ?? "..."}
+                      </span>
+                    </button>
+
+                    {showProfileMenu && (
+                      <div className="absolute right-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-custom-lg">
+                        <div className="border-b border-zinc-100 px-4 py-3">
+                          <p className="truncate text-sm font-semibold text-zinc-900">
+                            {user?.name ?? "..."}
+                          </p>
+                          <p className="truncate text-xs text-zinc-400">
+                            {user?.email}
+                          </p>
+                        </div>
+                        <Link
+                          href="/profile"
+                          onClick={() => setShowProfileMenu(false)}
+                          className="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50"
+                        >
+                          <UserCircle size={15} className="text-zinc-400" />
+                          Profil saya
+                        </Link>
+                        <Link
+                          href="/booking"
+                          onClick={() => setShowProfileMenu(false)}
+                          className="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50"
+                        >
+                          <Navigation size={15} className="text-zinc-400" />
+                          Perjalanan
+                        </Link>
+                        <div className="border-t border-zinc-100" />
+                        <button
+                          onClick={handleLogout}
+                          disabled={logout.isPending}
+                          className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 disabled:opacity-50"
+                        >
+                          <LogOut size={15} />
+                          {logout.isPending ? "Keluar..." : "Keluar"}
+                        </button>
                       </div>
                     )}
-                    <span className="max-w-24 truncate text-sm font-medium text-zinc-800">
-                      {firstName ?? "..."}
-                    </span>
-                  </button>
-
-                  {showProfileMenu && (
-                    <div className="absolute right-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-custom-lg">
-                      <div className="border-b border-zinc-100 px-4 py-3">
-                        <p className="truncate text-sm font-semibold text-zinc-900">
-                          {user?.name ?? "..."}
-                        </p>
-                        <p className="truncate text-xs text-zinc-400">
-                          {user?.email}
-                        </p>
-                      </div>
-                      <Link
-                        href="/profile"
-                        onClick={() => setShowProfileMenu(false)}
-                        className="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50"
-                      >
-                        <UserCircle size={15} className="text-zinc-400" />
-                        Profil saya
-                      </Link>
-                      <Link
-                        href="/booking"
-                        onClick={() => setShowProfileMenu(false)}
-                        className="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50"
-                      >
-                        <Navigation size={15} className="text-zinc-400" />
-                        Perjalanan
-                      </Link>
-                      <div className="border-t border-zinc-100" />
-                      <button
-                        onClick={handleLogout}
-                        disabled={logout.isPending}
-                        className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 disabled:opacity-50"
-                      >
-                        <LogOut size={15} />
-                        {logout.isPending ? "Keluar..." : "Keluar"}
-                      </button>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )
               ) : (
                 <button
                   type="button"
@@ -709,8 +713,8 @@ export default function Navbar({
           </div>
         )}
 
-        {/* ── expanded search dropdown (compact mode, pill clicked) ── */}
-        {searchOpen && isCompact && (
+        {/* ── expanded search dropdown (pill clicked) ── */}
+        {searchOpen && (
           <div className="hidden md:block border-t border-zinc-100 bg-white px-6 py-5 lg:px-12 relative z-[110]">
             <div className="mx-auto max-w-3xl">
               <SearchBar

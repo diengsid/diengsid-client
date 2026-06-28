@@ -34,7 +34,7 @@ import { useBookingCalculation } from "@/hooks/use-booking-calculation";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { scrollToId } from "@/lib/utils";
 import { useAvailability } from "../hooks/useAvailability";
-import { useFindProperty } from "../hooks/useFindProperty";
+import { useFindPropertyBySlug } from "../hooks/useFindProperty";
 import type { Amenity } from "../schemas/schema-property";
 
 import DetailImageProperty from "./detail-image";
@@ -49,14 +49,14 @@ const MapViewer = dynamic(
 );
 
 interface Props {
-  propertyId: string;
+  propertySlug: string;
   checkIn: Date | null;
   checkOut: Date | null;
   rentableId: string;
 }
 
 export default function DetailProperty({
-  propertyId,
+  propertySlug,
   checkIn,
   checkOut,
   rentableId,
@@ -67,7 +67,7 @@ export default function DetailProperty({
     start: checkIn,
     end: checkOut,
   });
-  const { data, isFetching } = useFindProperty(propertyId);
+  const { data, isFetching } = useFindPropertyBySlug(propertySlug);
   const property = data?.data;
   const rating = 0; // replace with real API data when available
 
@@ -92,6 +92,8 @@ export default function DetailProperty({
     isReady,
   } = useBookingCalculation({ dateRange, rentable });
 
+  const propertyId = property?.id ?? "";
+
   const { data: nearbyData } = useQuery({
     queryKey: ["nearby-attractions", propertyId],
     queryFn: () => getNearbyAttractions(propertyId),
@@ -105,8 +107,11 @@ export default function DetailProperty({
 
   useEffect(() => {
     if (!rentableID || rentableID === rentableId) return;
-    setParams({ rentable_id: rentableID });
-  }, [rentableID, rentableId, setParams]);
+    const params = new URLSearchParams(window.location.search);
+    params.set("rentable_id", rentableID);
+    router.replace(`?${params.toString()}`, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rentableID, rentableId]);
 
   const isLoadingPrice = isFetching || !property || !isReady;
 
@@ -184,7 +189,7 @@ export default function DetailProperty({
       end_date: format(dateRange.end, "yyyy-MM-dd"),
       rentable_id: rentableID,
     });
-    router.push(`/booking/penginapan/${propertyId}?${queryParams.toString()}`);
+    router.push(`/booking/penginapan/${property?.id}?${queryParams.toString()}`);
   };
 
   // ── Price render ──────────────────────────────────────────────────────────
@@ -533,7 +538,7 @@ export default function DetailProperty({
             <hr className="my-8 border-zinc-100" />
             <PropertyRecommendations
               currentId={propertyId}
-              propertyType={property?.property_type}
+              propertyType={property?.property_type ?? ""}
             />
           </div>
 

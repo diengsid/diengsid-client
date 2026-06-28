@@ -32,3 +32,15 @@ export const detailProperty = async (
 
   return { ...response.data, data: response.data.data };
 };
+
+export const detailPropertyBySlug = async (
+  slug: string,
+): Promise<ResponseData<Property>> => {
+  const response = await api.get(`properties/slug/${slug}`);
+
+  if (response.status !== 200) {
+    throw new Error(response.data.error || "Fetch property failed");
+  }
+
+  return { ...response.data, data: response.data.data };
+};
