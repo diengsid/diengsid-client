@@ -72,7 +72,7 @@ export default function MenuBarBottom({ token }: Props): React.ReactNode {
   return (
     <div
       className={clsx(
-        "w-full border-t ease-in-out transition-all delay-150 border-zinc-100 bottom-0 fixed bg-white flex p-2 items-center px-10 z-9999",
+        "w-full border-t ease-in-out transition-all delay-150 border-zinc-100 bottom-0 fixed bg-white flex p-2 items-center px-10 z-90",
         {
           "justify-between": token,
         },

@@ -13,7 +13,11 @@ import BlogSection from "@/features/blog/blog-section";
 import PropertyRecomendation from "@/features/properties/components/property-recommendations";
 import { serverGetProperties } from "@/features/properties/services/property-server-service";
 import WeatherSection from "@/features/weather/components/weather-section";
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
@@ -92,12 +96,13 @@ export default async function HomePenginapanPage() {
         <BlogSection />
       </Suspense>
 
+      {/* Menjadi Tuan Rumah */}
+      <BecomeHost />
+
       {/* Weather Section */}
       <Suspense>
         <WeatherSection />
       </Suspense>
-      {/* Menjadi Tuan Rumah */}
-      <BecomeHost />
 
       {/* Footer */}
       <Footer />

@@ -57,7 +57,9 @@ function AttractionCard({ a }: { a: Attraction }) {
           />
         ) : null}
       </div>
-      <p className="line-clamp-2 text-center text-sm text-zinc-800">{a.name}</p>
+      <p className="line-clamp-2 text-center text-sm text-zinc-800">
+        Penginapan dekat {a.name}
+      </p>
     </Link>
   );
 }

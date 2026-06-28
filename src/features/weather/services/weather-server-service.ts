@@ -44,7 +44,6 @@ export async function getWeather(): Promise<WeatherData> {
 
   const res = await fetch(url.toString(), {
     next: { revalidate: 900 },
-    signal: AbortSignal.timeout(8000),
   });
 
   if (!res.ok) throw new Error("Gagal mengambil data cuaca");

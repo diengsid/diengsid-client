@@ -14,11 +14,17 @@ import { getWeather } from "../services/weather-server-service";
 
 const DAY_SHORT = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
+const timeout = (ms: number) =>
+  new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error(`Weather fetch timed out after ${ms}ms`)), ms),
+  );
+
 export default async function WeatherSection() {
   let weather;
   try {
-    weather = await getWeather();
-  } catch {
+    weather = await Promise.race([getWeather(), timeout(10000)]);
+  } catch (err) {
+    console.error("[WeatherSection]", err instanceof Error ? err.message : err);
     return null;
   }
 

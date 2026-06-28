@@ -113,7 +113,7 @@ export default function SearchBarMobile() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full cursor-pointer items-center gap-3 rounded-full border border-zinc-200 bg-white px-4 py-3 shadow-sm active:scale-[0.98] transition-transform"
+        className="flex w-full cursor-pointer items-center gap-3 rounded-full border border-zinc-200 bg-white px-4 py-3 shadow-sm active:scale-[0.98] transition-transform "
       >
         <Search size={16} className="shrink-0 text-zinc-400" />
         <div className="flex flex-1 flex-col items-start text-left">
@@ -129,7 +129,7 @@ export default function SearchBarMobile() {
 
       {/* ── full-screen overlay ── */}
       {open && (
-        <div className="fixed inset-0 z-10000 flex flex-col bg-white">
+        <div className="fixed inset-0 z-50 flex flex-col bg-white">
           {/* header */}
           <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
             <p className="text-sm font-semibold text-zinc-900">
