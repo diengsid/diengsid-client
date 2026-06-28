@@ -8,9 +8,12 @@ import Navbar from "@/components/shared/navbar/navbar";
 import SearchBar from "@/components/shared/search-bar/SearchBar";
 import SearchBarMobile from "@/components/shared/search-bar/SearchBarMobile";
 import AttractionRecomendation from "@/features/attractions/components/attraction-recomendation";
+import { serverGetAttractions } from "@/features/attractions/services/attraction-server-service";
 import BlogSection from "@/features/blog/blog-section";
 import PropertyRecomendation from "@/features/properties/components/property-recommendations";
+import { serverGetProperties } from "@/features/properties/services/property-server-service";
 import WeatherSection from "@/features/weather/components/weather-section";
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 
@@ -46,6 +49,19 @@ export default async function HomePenginapanPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
+  const queryClient = new QueryClient();
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ["attractions"],
+      queryFn: serverGetAttractions,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["property-recommendation-home"],
+      queryFn: () => serverGetProperties({ page: 1, size: 12 }),
+    }),
+  ]);
+  const dehydratedState = dehydrate(queryClient);
+
   return (
     <>
       {/* Navbar */}
@@ -62,10 +78,12 @@ export default async function HomePenginapanPage() {
       <div className="md:hidden px-4 py-4 z-100 relative  -top-12 ">
         <SearchBarMobile />
       </div>
-      {/* Destination Recommendation */}
-      <AttractionRecomendation />
-      {/* Property Recommendation */}
-      <PropertyRecomendation />
+      <HydrationBoundary state={dehydratedState}>
+        {/* Destination Recommendation */}
+        <AttractionRecomendation />
+        {/* Property Recommendation */}
+        <PropertyRecomendation />
+      </HydrationBoundary>
       {/* Search By Type */}
       <CategoriesSection />
       {/* Blog */}
