@@ -3,15 +3,7 @@ import type { WeatherData } from "../types";
 const DIENG_LAT = -7.2052167;
 const DIENG_LON = 109.9046361;
 
-// Open-Meteo interpolates from a ~1 km grid that includes lower-elevation
-// terrain around Dieng, causing consistently warmer and cloudier readings
-// than the actual 2,093 m plateau. Both constants correct to match observed
-// conditions — adjust if real-world readings diverge again.
 const TEMP_CORRECTION_C = -6;
-
-// Shifts WMO codes 1–3 (mainly-clear → overcast) toward clearer sky.
-// Codes ≥ 45 (fog, drizzle, rain, storm) are left untouched — if the model
-// predicts rain it's generally correct even at altitude.
 const WEATHER_CODE_CORRECTION = -3;
 
 function tc(raw: number): number {
@@ -23,8 +15,8 @@ function wc(code: number): number {
   return code;
 }
 
-export async function getWeather(): Promise<WeatherData> {
-  const url = new URL("https://api.open-meteo.com/v1/forecast")
+function buildWeatherUrl(): string {
+  const url = new URL("https://api.open-meteo.com/v1/forecast");
   url.searchParams.set("latitude", String(DIENG_LAT));
   url.searchParams.set("longitude", String(DIENG_LON));
   url.searchParams.set(
@@ -41,16 +33,11 @@ export async function getWeather(): Promise<WeatherData> {
   );
   url.searchParams.set("timezone", "Asia/Jakarta");
   url.searchParams.set("forecast_days", "7");
+  return url.toString();
+}
 
-  const res = await fetch(url.toString(), {
-    next: { revalidate: 900 },
-  });
-
-  if (!res.ok) throw new Error("Gagal mengambil data cuaca");
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const data: any = await res.json();
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseWeatherData(data: any): WeatherData {
   return {
     current: {
       temperature: tc(data.current.temperature_2m),
@@ -64,7 +51,7 @@ export async function getWeather(): Promise<WeatherData> {
       isDay: data.current.is_day === 1,
       time: data.current.time,
     },
-    daily: (data.daily.time as string[]).map((date, i) => ({
+    daily: (data.daily.time as string[]).map((date: string, i: number) => ({
       date,
       weatherCode: wc(data.daily.weather_code[i]),
       tempMax: tc(data.daily.temperature_2m_max[i]),
@@ -76,7 +63,7 @@ export async function getWeather(): Promise<WeatherData> {
       windSpeedMax: Math.round(data.daily.wind_speed_10m_max[i]),
       windSpeedMin: Math.round(data.daily.wind_speed_10m_min[i]),
     })),
-    earlyMorning: (data.daily.time as string[]).map((date, dayIndex) => ({
+    earlyMorning: (data.daily.time as string[]).map((date: string, dayIndex: number) => ({
       date,
       hours: [3, 4, 5, 6].map((hour) => {
         const idx = dayIndex * 24 + hour;
@@ -92,4 +79,20 @@ export async function getWeather(): Promise<WeatherData> {
       }),
     })),
   };
+}
+
+/** Server-side fetch — uses Next.js ISR cache (revalidate 15 min). */
+export async function getWeather(): Promise<WeatherData> {
+  const res = await fetch(buildWeatherUrl(), {
+    next: { revalidate: 900 },
+  });
+  if (!res.ok) throw new Error("Gagal mengambil data cuaca");
+  return parseWeatherData(await res.json());
+}
+
+/** Client-side fetch — plain fetch, no Next.js cache directives. */
+export async function getWeatherClient(): Promise<WeatherData> {
+  const res = await fetch(buildWeatherUrl());
+  if (!res.ok) throw new Error("Gagal mengambil data cuaca");
+  return parseWeatherData(await res.json());
 }

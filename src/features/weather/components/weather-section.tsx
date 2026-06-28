@@ -1,3 +1,5 @@
+"use client";
+
 import {
   frostRiskConfig,
   predictFrost,
@@ -6,27 +8,55 @@ import {
   getWeatherInfo,
   windDirectionLabel,
 } from "@/features/weather/utils/weather-code";
+import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { ArrowRight, Droplets, Snowflake, Wind } from "lucide-react";
 import Link from "next/link";
-import { getWeather } from "../services/weather-server-service";
+import { getWeatherClient } from "../services/weather-server-service";
+import type { DailyForecast } from "../types";
 
 const DAY_SHORT = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
-const timeout = (ms: number) =>
-  new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error(`Weather fetch timed out after ${ms}ms`)), ms),
+function WeatherSkeleton() {
+  return (
+    <section className="px-4 py-6 md:px-12 lg:px-20">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="h-6 w-32 animate-pulse rounded-full bg-zinc-200" />
+        <div className="h-4 w-20 animate-pulse rounded-full bg-zinc-200" />
+      </div>
+      <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+        <div className="flex items-center gap-4 p-5">
+          <div className="h-16 w-16 animate-pulse rounded-2xl bg-zinc-200" />
+          <div className="space-y-2">
+            <div className="h-8 w-24 animate-pulse rounded-full bg-zinc-200" />
+            <div className="h-3 w-16 animate-pulse rounded-full bg-zinc-200" />
+          </div>
+        </div>
+        <div className="grid grid-cols-5 border-t border-zinc-100">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex flex-col items-center gap-2 py-4 border-r border-zinc-100 last:border-r-0">
+              <div className="h-3 w-6 animate-pulse rounded bg-zinc-200" />
+              <div className="h-8 w-8 animate-pulse rounded-xl bg-zinc-200" />
+              <div className="h-3 w-8 animate-pulse rounded bg-zinc-200" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
+}
 
-export default async function WeatherSection() {
-  let weather;
-  try {
-    weather = await Promise.race([getWeather(), timeout(10000)]);
-  } catch (err) {
-    console.error("[WeatherSection]", err instanceof Error ? err.message : err);
-    return null;
-  }
+export default function WeatherSection() {
+  const { data: weather, isLoading, isError } = useQuery({
+    queryKey: ["weather-dieng"],
+    queryFn: getWeatherClient,
+    staleTime: 15 * 60 * 1000,
+    retry: 1,
+  });
+
+  if (isLoading) return <WeatherSkeleton />;
+  if (isError || !weather) return null;
 
   const { current, daily } = weather;
   const info = getWeatherInfo(current.weatherCode, current.isDay);
@@ -94,7 +124,7 @@ export default async function WeatherSection() {
 
         {/* 5-day forecast */}
         <div className="grid grid-cols-5 border-t border-zinc-100">
-          {next5.map((day) => {
+          {next5.map((day: DailyForecast) => {
             const d = parseISO(day.date);
             const dayName = DAY_SHORT[d.getDay()];
             const dateStr = format(d, "d MMM", { locale: localeId });
