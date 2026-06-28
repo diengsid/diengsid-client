@@ -16,6 +16,7 @@ import WeatherSection from "@/features/weather/components/weather-section";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Wisata Dieng Wonosobo | Penginapan & Tour Terbaik",
@@ -87,10 +88,14 @@ export default async function HomePenginapanPage() {
       {/* Search By Type */}
       <CategoriesSection />
       {/* Blog */}
-      <BlogSection />
+      <Suspense>
+        <BlogSection />
+      </Suspense>
 
       {/* Weather Section */}
-      <WeatherSection />
+      <Suspense>
+        <WeatherSection />
+      </Suspense>
       {/* Menjadi Tuan Rumah */}
       <BecomeHost />
 
