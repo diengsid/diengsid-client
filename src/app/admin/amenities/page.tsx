@@ -61,7 +61,7 @@ function CreateModal({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/50 p-4">
       <div className="w-full max-w-lg rounded-2xl bg-white shadow-custom-lg flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4 shrink-0">
-          <h3 className="font-semibold text-zinc-900">Tambah Amenity</h3>
+          <h3 className="font-semibold text-zinc-900">Tambah Fasilitas</h3>
           <button
             onClick={onClose}
             className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100"
