@@ -84,7 +84,7 @@ export default function AttractionRecomendation() {
   };
 
   return (
-    <section className="px-4 py-6 md:px-12 lg:px-20">
+    <section className="px-4 pb-6 md:px-12 lg:px-20">
       {/* header row */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">

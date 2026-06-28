@@ -80,7 +80,7 @@ export default async function HomePenginapanPage() {
         <SearchBar />
       </div>
       {/* Search Bar — mobile only */}
-      <div className="md:hidden px-4 py-4 z-100 relative  -top-12 ">
+      <div className="md:hidden px-4 z-100 relative -top-7 ">
         <SearchBarMobile />
       </div>
       <HydrationBoundary state={dehydratedState}>
