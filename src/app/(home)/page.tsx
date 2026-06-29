@@ -108,7 +108,7 @@ export default async function HomePenginapanPage() {
       <Footer />
       {/* Menu Bar Bottom */}
       <div className="md:hidden">
-        <MenuBarBottom />
+        <MenuBarBottom token={token?.value} />
       </div>
     </>
   );
