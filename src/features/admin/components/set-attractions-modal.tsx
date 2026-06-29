@@ -9,13 +9,11 @@ import {
 } from "@/features/admin/services/attraction-service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, MapPin, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 type RowState = {
   checked: boolean;
-  distance_km: string;
-  duration_minutes: string;
   sort_order: number;
 };
 
@@ -31,7 +29,7 @@ export function SetAttractionsModal({
   onClose,
 }: Props) {
   const queryClient = useQueryClient();
-  const [rows, setRows] = useState<Record<string, RowState>>({});
+  const [overrides, setOverrides] = useState<Record<string, Partial<RowState>>>({});
 
   const { data: allData, isLoading: loadingAll } = useQuery({
     queryKey: ["attractions"],
@@ -43,23 +41,20 @@ export function SetAttractionsModal({
     queryFn: () => getNearbyAttractions(propertyId),
   });
 
-  // Pre-fill rows when both datasets are ready
-  useEffect(() => {
+  const rows = useMemo<Record<string, RowState>>(() => {
     const all = Array.isArray(allData?.data) ? allData.data : [];
     const nearby = Array.isArray(nearbyData?.data) ? nearbyData.data : [];
-
-    const initial: Record<string, RowState> = {};
+    const result: Record<string, RowState> = {};
     all.forEach((a) => {
       const existing = nearby.find((n) => n.tourist_attraction_id === a.id);
-      initial[a.id] = {
+      const base: RowState = {
         checked: !!existing,
-        distance_km: existing?.distance_km?.toString() ?? "",
-        duration_minutes: existing?.duration_minutes?.toString() ?? "",
         sort_order: existing?.sort_order ?? 0,
       };
+      result[a.id] = { ...base, ...overrides[a.id] };
     });
-    setRows(initial);
-  }, [allData, nearbyData]);
+    return result;
+  }, [allData, nearbyData, overrides]);
 
   const mutation = useMutation({
     mutationFn: (items: NearbyAttractionItem[]) =>
@@ -79,26 +74,16 @@ export function SetAttractionsModal({
       .filter(([, r]) => r.checked)
       .map(([id, r], idx) => ({
         tourist_attraction_id: id,
-        distance_km: r.distance_km ? parseFloat(r.distance_km) : undefined,
-        duration_minutes: r.duration_minutes
-          ? parseInt(r.duration_minutes)
-          : undefined,
         sort_order: r.sort_order || idx,
       }));
     mutation.mutate(items);
   };
 
   const toggle = (id: string) =>
-    setRows((prev) => ({
+    setOverrides((prev) => ({
       ...prev,
-      [id]: { ...prev[id], checked: !prev[id].checked },
+      [id]: { ...prev[id], checked: !rows[id]?.checked },
     }));
-
-  const updateField = (
-    id: string,
-    field: "distance_km" | "duration_minutes",
-    val: string,
-  ) => setRows((prev) => ({ ...prev, [id]: { ...prev[id], [field]: val } }));
 
   const attractions: AttractionResponse[] = allData?.data ?? [];
   const isLoading = loadingAll || loadingNearby;
@@ -165,46 +150,6 @@ export function SetAttractionsModal({
                       )}
                     </div>
                   </label>
-
-                  {row.checked && (
-                    <div className="mt-3 grid grid-cols-2 gap-2 pl-7">
-                      <div>
-                        <label className="text-xs text-zinc-500 mb-1 block">
-                          Jarak (km)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.1"
-                          value={row.distance_km}
-                          onChange={(e) =>
-                            updateField(a.id, "distance_km", e.target.value)
-                          }
-                          placeholder="Contoh: 1.5"
-                          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-primary-700"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-xs text-zinc-500 mb-1 block">
-                          Durasi (menit)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={row.duration_minutes}
-                          onChange={(e) =>
-                            updateField(
-                              a.id,
-                              "duration_minutes",
-                              e.target.value,
-                            )
-                          }
-                          placeholder="Contoh: 15"
-                          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-primary-700"
-                        />
-                      </div>
-                    </div>
-                  )}
                 </div>
               );
             })

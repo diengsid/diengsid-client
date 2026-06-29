@@ -29,6 +29,7 @@ interface Props {
   value?: DateRange;
   onChange?: (range: DateRange) => void;
   disabledDates?: Set<string>;
+  singleMonth?: boolean;
 }
 
 const DAY_LABELS = ["Min", "Sn", "Sl", "Rb", "Km", "Jm", "Sb"];
@@ -37,6 +38,7 @@ export default function DateRangePicker({
   value,
   onChange,
   disabledDates,
+  singleMonth = false,
 }: Props): React.ReactNode {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [startDate, setStartDate] = useState<Date | null>(value?.start ?? null);
@@ -192,7 +194,7 @@ export default function DateRangePicker({
 
   return (
     <div className="w-full p-4">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+      <div className={`grid grid-cols-1 gap-6 ${singleMonth ? "" : "md:grid-cols-2 md:gap-8"}`}>
 
         {/* month 1 */}
         <div className="min-w-0">
@@ -212,8 +214,8 @@ export default function DateRangePicker({
           {renderCells(currentMonth)}
         </div>
 
-        {/* month 2 — desktop only */}
-        <div className="hidden min-w-0 md:block">
+        {/* month 2 — desktop only, hidden when singleMonth */}
+        <div className={singleMonth ? "hidden" : "hidden min-w-0 md:block"}>
           <div className="mb-3 flex items-center justify-between">
             <div className="w-8" />
             <span className="text-sm font-semibold text-zinc-800">

@@ -28,8 +28,6 @@ export type AttractionCreateRequest = {
 
 export type NearbyAttractionItem = {
   tourist_attraction_id: string;
-  distance_km?: number;
-  duration_minutes?: number;
   sort_order: number;
 };
 
