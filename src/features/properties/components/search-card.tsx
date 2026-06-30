@@ -39,7 +39,7 @@ export default function SearchPropertyCard({
   const ci = checkIn ?? format(addDays(now, 1), "yyyy-MM-dd");
   const co = checkOut ?? format(addDays(now, 2), "yyyy-MM-dd");
 
-  const href = `/penginapan/${property.id}?check_in=${ci}&check_out=${co}`;
+  const href = `/penginapan/${property.slug}?check_in=${ci}&check_out=${co}`;
 
   const handleClick = () => {
     if (typeof window !== "undefined") {

@@ -66,7 +66,7 @@ function PropertyPopupCard({ property }: { property: Property }) {
     ? Math.min(...property.rentable.map((r) => r.base_price))
     : null;
 
-  const href = `/penginapan/${property.id}`;
+  const href = `/penginapan/${property.slug}`;
 
   return (
     <a

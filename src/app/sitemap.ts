@@ -60,10 +60,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
       .then((res) => (res.ok ? res.json() : null))
       .then((json) => {
-        const items: Array<{ id: string; updated_at: number }> =
+        const items: Array<{ slug: string; updated_at: number }> =
           Array.isArray(json?.data) ? json.data : [];
         propertyPages = items.map((p) => ({
-          url: `${SITE_URL}/penginapan/${p.id}`,
+          url: `${SITE_URL}/penginapan/${p.slug}`,
           lastModified: toLastModified(p.updated_at),
           changeFrequency: "weekly" as const,
           priority: 0.8,

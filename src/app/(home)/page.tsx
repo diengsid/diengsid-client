@@ -84,10 +84,10 @@ export default async function HomePenginapanPage() {
         <SearchBarMobile />
       </div>
       <HydrationBoundary state={dehydratedState}>
-        {/* Destination Recommendation */}
-        <AttractionRecomendation />
         {/* Property Recommendation */}
         <PropertyRecomendation />
+        {/* Destination Recommendation */}
+        <AttractionRecomendation />
       </HydrationBoundary>
       {/* Search By Type */}
       <CategoriesSection />
